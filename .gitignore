@@ -1,0 +1,64 @@
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+
+# Spring Tool Suite (STS)
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# Maven ve Gradle
+target/
+build/
+!/.mvn/wrapper/maven-wrapper.jar
+mvnw
+mvnw.cmd
+
+# Java Bytecode ve compiled files
+*.class
+*.jar
+*.war
+*.ear
+
+# Log and temp files
+logs/
+*.log
+*.pid
+*.gz
+*.swp
+
+# db files (H2, SQLite vb.)
+*.h2.db
+*.mv.db
+*.sqlite
+data/
+db/
+.env
+.env.local
+
+# MacOS and Windows system files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Node.js files
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Spring Boot Actuator
+actuator.log
