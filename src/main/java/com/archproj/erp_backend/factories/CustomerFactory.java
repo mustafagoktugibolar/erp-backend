@@ -1,5 +1,8 @@
-package com.archproj.erp_backend.models;
+package com.archproj.erp_backend.factories;
 
+import com.archproj.erp_backend.models.CorporateCustomer;
+import com.archproj.erp_backend.models.Customer;
+import com.archproj.erp_backend.models.IndividualCustomer;
 import com.archproj.erp_backend.utils.CustomerTypeEnum;
 
 public class CustomerFactory {

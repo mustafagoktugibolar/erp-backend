@@ -2,9 +2,13 @@ package com.archproj.erp_backend.models;
 
 import com.archproj.erp_backend.utils.CompanyTypeEnum;
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "companies")
+@Data
+@NoArgsConstructor
 public class Company {
 
     @Id
@@ -17,5 +21,9 @@ public class Company {
     @Enumerated(EnumType.STRING)
     private CompanyTypeEnum companyType;
 
-    // Constructors, Getters, and Setters
+    public Company(String name, String email, CompanyTypeEnum companyType) {
+        this.name = name;
+        this.email = email;
+        this.companyType = companyType;
+    }
 }
