@@ -1,12 +1,9 @@
 package com.archproj.erp_backend.services;
 
-import com.archproj.erp_backend.dtos.CompanyDTO;
-import com.archproj.erp_backend.factories.CompanyFactory;
-import com.archproj.erp_backend.mappers.DTOMapper;
+import com.archproj.erp_backend.entities.CompanyEntity;
 import com.archproj.erp_backend.models.Company;
 import com.archproj.erp_backend.repositories.CompanyRepository;
 import com.archproj.erp_backend.utils.CompanyTypeEnum;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,25 +12,46 @@ import java.util.stream.Collectors;
 @Service
 public class CompanyService {
 
-    @Autowired
-    private CompanyRepository companyRepository;
+    private final CompanyRepository companyRepository;
 
-    public List<CompanyDTO> getAllCompanies() {
+    public CompanyService(CompanyRepository companyRepository) {
+        this.companyRepository = companyRepository;
+    }
+
+    public List<Company> getAllCompanies() {
         return companyRepository.findAll()
                 .stream()
-                .map(DTOMapper::toCompanyDTO)
+                .map(this::convertEntityToModel)
                 .collect(Collectors.toList());
     }
 
-    public CompanyDTO getCompanyById(Long id) {
-        Company company = companyRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Company not found"));
-        return DTOMapper.toCompanyDTO(company);
+    public Company getCompanyById(Long id) {
+        CompanyEntity entity = companyRepository.findById(id).orElse(null);
+        return entity != null ? convertEntityToModel(entity) : null;
     }
 
-    public CompanyDTO createCompany(String name, String email, CompanyTypeEnum type) {
-        Company company = CompanyFactory.createCompany(name, email, type);
-        company = companyRepository.save(company);
-        return DTOMapper.toCompanyDTO(company);
+    public Company createCompany(Company company) {
+        CompanyEntity entity = convertModelToEntity(company);
+        CompanyEntity savedEntity = companyRepository.save(entity);
+        return convertEntityToModel(savedEntity);
+    }
+
+    public void deleteCompany(Long id) {
+        companyRepository.deleteById(id);
+    }
+
+    // In CompanyService
+    private Company convertEntityToModel(CompanyEntity entity) {
+        Company company = new Company(entity.getName(), entity.getEmail(), CompanyTypeEnum.valueOf(entity.getType()));
+        company.setId(entity.getId()); // <- Add this line!
+        return company;
+    }
+
+    private CompanyEntity convertModelToEntity(Company model) {
+        CompanyEntity entity = new CompanyEntity();
+        entity.setName(model.getName());
+        entity.setEmail(model.getEmail());
+        entity.setType(model.getType().name());
+        return entity;
     }
 }

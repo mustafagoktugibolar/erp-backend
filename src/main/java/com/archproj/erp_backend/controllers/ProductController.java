@@ -1,8 +1,9 @@
 package com.archproj.erp_backend.controllers;
 
-import com.archproj.erp_backend.dtos.ProductDTO;
+import com.archproj.erp_backend.factories.ProductFactory;
+import com.archproj.erp_backend.models.Product;
 import com.archproj.erp_backend.services.ProductService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.archproj.erp_backend.utils.ProductTypeEnum;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,32 +12,32 @@ import java.util.List;
 @RequestMapping("/api/products")
 public class ProductController {
 
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
+
+    public ProductController(ProductService productService) {
+        this.productService = productService;
+    }
 
     @GetMapping
-    public List<ProductDTO> getAllProducts() {
+    public List<Product> getAllProducts() {
         return productService.getAllProducts();
     }
 
     @GetMapping("/{id}")
-    public ProductDTO getProductById(@PathVariable Long id) {
+    public Product getProductById(@PathVariable Long id) {
         return productService.getProductById(id);
     }
 
     @PostMapping
-    public ProductDTO createProduct(@RequestParam String name,
-                                    @RequestParam double price) {
-        return productService.createProduct(name, price);
+    public Product createProduct(@RequestParam ProductTypeEnum type,
+                                 @RequestParam String name,
+                                 @RequestParam Double price) {
+        Product product = ProductFactory.createProduct(type, name, price);
+        return productService.createProduct(product);
     }
 
-    @PutMapping("/{id}/discount")
-    public double applyDiscount(@PathVariable Long id, @RequestParam double percentage) {
-        return productService.applyDiscount(id, percentage);
-    }
-
-    @PutMapping("/{id}/premium")
-    public double applyPremium(@PathVariable Long id, @RequestParam double percentage) {
-        return productService.applyPremium(id, percentage);
+    @DeleteMapping("/{id}")
+    public void deleteProduct(@PathVariable Long id) {
+        productService.deleteProduct(id);
     }
 }

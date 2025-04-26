@@ -1,62 +1,105 @@
 package com.archproj.erp_backend.services;
 
-import com.archproj.erp_backend.dtos.OrderDTO;
+import com.archproj.erp_backend.entities.OrderEntity;
+import com.archproj.erp_backend.entities.OrderItemEntity;
 import com.archproj.erp_backend.factories.OrderFactory;
-import com.archproj.erp_backend.mappers.DTOMapper;
-import com.archproj.erp_backend.models.Customer;
 import com.archproj.erp_backend.models.Order;
-import com.archproj.erp_backend.observer.OrderObserver;
-import com.archproj.erp_backend.repositories.CustomerRepository;
+import com.archproj.erp_backend.models.OrderItem;
 import com.archproj.erp_backend.repositories.OrderRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class OrderService {
 
-    @Autowired
-    private OrderRepository orderRepository;
+    private final OrderRepository orderRepository;
 
-    @Autowired
-    private CustomerRepository customerRepository;
-
-    private final List<OrderObserver> observers = new ArrayList<>();
-
-    public void addObserver(OrderObserver observer) {
-        observers.add(observer);
+    public List<OrderEntity> getAllOrders() {
+        return orderRepository.findAll();
     }
 
-    public List<OrderDTO> getAllOrders() {
-        return orderRepository.findAll()
-                .stream()
-                .map(DTOMapper::toOrderDTO)
-                .collect(Collectors.toList());
+    public OrderEntity getOrderById(Long id) {
+        return orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Order not found with id: " + id));
     }
 
-    public OrderDTO getOrderById(Long id) {
-        Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
-        return DTOMapper.toOrderDTO(order);
+    public OrderEntity createOrder(Order order) {
+        OrderEntity orderEntity = OrderFactory.createOrder(order);
+        return orderRepository.save(orderEntity);
     }
 
-    public OrderDTO createOrder(String orderId, String status, Long customerId) {
-        Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
-
-        Order order = OrderFactory.createOrder(orderId, status, customer);
-        order = orderRepository.save(order);
-        notifyObservers("Order " + orderId + " has been placed.");
-
-        return DTOMapper.toOrderDTO(order);
+    public void deleteOrder(Long id) {
+        orderRepository.deleteById(id);
     }
 
-    private void notifyObservers(String message) {
-        for (OrderObserver observer : observers) {
-            observer.update(message);
+    public OrderEntity addItemToOrder(Long orderId, OrderItem orderItem) {
+        OrderEntity order = getOrderById(orderId);
+
+        OrderItemEntity itemEntity = new OrderItemEntity();
+        itemEntity.setProductId(orderItem.getProductId());
+        itemEntity.setProductName(orderItem.getProductName());
+        itemEntity.setQuantity(orderItem.getQuantity());
+        itemEntity.setUnitPrice(orderItem.getUnitPrice());
+        itemEntity.setTotalPrice(orderItem.getQuantity() * orderItem.getUnitPrice());
+        itemEntity.setOrder(order);
+
+        order.getItems().add(itemEntity);
+
+        // totalAmount güncelle
+        double newTotal = order.getItems().stream()
+                .mapToDouble(OrderItemEntity::getTotalPrice)
+                .sum();
+        order.setTotalAmount(newTotal);
+
+        return orderRepository.save(order);
+    }
+
+    public OrderEntity updateItemInOrder(Long orderId, Long itemId, OrderItem orderItem) {
+        OrderEntity order = getOrderById(orderId);
+
+        OrderItemEntity itemEntity = order.getItems().stream()
+                .filter(i -> i.getId().equals(itemId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("OrderItem not found with id: " + itemId));
+
+        itemEntity.setProductId(orderItem.getProductId());
+        itemEntity.setProductName(orderItem.getProductName());
+        itemEntity.setQuantity(orderItem.getQuantity());
+        itemEntity.setUnitPrice(orderItem.getUnitPrice());
+        itemEntity.setTotalPrice(orderItem.getQuantity() * orderItem.getUnitPrice());
+
+        // totalAmount güncelle
+        double newTotal = order.getItems().stream()
+                .mapToDouble(OrderItemEntity::getTotalPrice)
+                .sum();
+        order.setTotalAmount(newTotal);
+
+        return orderRepository.save(order);
+    }
+
+    public OrderEntity removeItemFromOrder(Long orderId, Long itemId) {
+        OrderEntity order = getOrderById(orderId);
+
+        boolean removed = order.getItems().removeIf(item -> item.getId().equals(itemId));
+        if (!removed) {
+            throw new RuntimeException("OrderItem not found with id: " + itemId);
         }
+
+        // totalAmount güncelle
+        double newTotal = order.getItems().stream()
+                .mapToDouble(OrderItemEntity::getTotalPrice)
+                .sum();
+        order.setTotalAmount(newTotal);
+
+        return orderRepository.save(order);
     }
+
+    public List<OrderItemEntity> getOrderItems(Long orderId) {
+        OrderEntity order = getOrderById(orderId);
+        return order.getItems();
+    }
+
 }

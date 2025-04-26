@@ -1,49 +1,58 @@
 package com.archproj.erp_backend.controllers;
 
-import com.archproj.erp_backend.dtos.OrderDTO;
-import com.archproj.erp_backend.observer.EmailNotificationService;
-import com.archproj.erp_backend.observer.StockUpdateService;
+import com.archproj.erp_backend.entities.OrderEntity;
+import com.archproj.erp_backend.entities.OrderItemEntity;
+import com.archproj.erp_backend.models.Order;
+import com.archproj.erp_backend.models.OrderItem;
 import com.archproj.erp_backend.services.OrderService;
-import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
+@RequiredArgsConstructor
 public class OrderController {
 
-    @Autowired
-    private OrderService orderService;
-
-    @Autowired
-    private EmailNotificationService emailNotificationService;
-
-    @Autowired
-    private StockUpdateService stockUpdateService;
-
-    // ✅ This runs AFTER dependencies are injected
-    @PostConstruct
-    public void registerObservers() {
-        orderService.addObserver(emailNotificationService);
-        orderService.addObserver(stockUpdateService);
-    }
+    private final OrderService orderService;
 
     @GetMapping
-    public List<OrderDTO> getAllOrders() {
+    public List<OrderEntity> getAllOrders() {
         return orderService.getAllOrders();
     }
 
     @GetMapping("/{id}")
-    public OrderDTO getOrderById(@PathVariable Long id) {
+    public OrderEntity getOrderById(@PathVariable Long id) {
         return orderService.getOrderById(id);
     }
 
     @PostMapping
-    public OrderDTO createOrder(@RequestParam String orderId,
-                                @RequestParam String status,
-                                @RequestParam Long customerId) {
-        return orderService.createOrder(orderId, status, customerId);
+    public OrderEntity createOrder(@RequestBody Order order) {
+        return orderService.createOrder(order);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteOrder(@PathVariable Long id) {
+        orderService.deleteOrder(id);
+    }
+    @PostMapping("/{orderId}/items")
+    public OrderEntity addItemToOrder(@PathVariable Long orderId, @RequestBody OrderItem orderItem) {
+        return orderService.addItemToOrder(orderId, orderItem);
+    }
+
+    @PutMapping("/{orderId}/items/{itemId}")
+    public OrderEntity updateItemInOrder(@PathVariable Long orderId, @PathVariable Long itemId, @RequestBody OrderItem orderItem) {
+        return orderService.updateItemInOrder(orderId, itemId, orderItem);
+    }
+
+    @DeleteMapping("/{orderId}/items/{itemId}")
+    public OrderEntity removeItemFromOrder(@PathVariable Long orderId, @PathVariable Long itemId) {
+        return orderService.removeItemFromOrder(orderId, itemId);
+    }
+
+    @GetMapping("/{orderId}/items")
+    public List<OrderItemEntity> getOrderItems(@PathVariable Long orderId) {
+        return orderService.getOrderItems(orderId);
     }
 }

@@ -1,26 +1,22 @@
 package com.archproj.erp_backend.models;
 
-import jakarta.persistence.*;
+import com.archproj.erp_backend.utils.OrderStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name = "orders")
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class Order {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String orderId;
-
-    private String status;
-
-    @ManyToOne
-    @JoinColumn(name = "customer_id", nullable = false)
-    private Customer customer;
+    private Long customerId;
+    private LocalDateTime orderDate;
+    private OrderStatusEnum status;
+    private Double totalAmount;
+    private List<OrderItem> items;
 }

@@ -1,10 +1,10 @@
 package com.archproj.erp_backend.services;
 
-import com.archproj.erp_backend.dtos.ProductDTO;
+import com.archproj.erp_backend.entities.ProductEntity;
+import com.archproj.erp_backend.factories.ProductFactory;
 import com.archproj.erp_backend.models.Product;
 import com.archproj.erp_backend.repositories.ProductRepository;
-import com.archproj.erp_backend.strategy.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.archproj.erp_backend.utils.ProductTypeEnum;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,57 +13,44 @@ import java.util.stream.Collectors;
 @Service
 public class ProductService {
 
-    @Autowired
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
-    @Autowired
-    private StandardPricing standardPricing;
+    public ProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
 
-    @Autowired
-    private DiscountPricing discountPricing;
-
-    @Autowired
-    private PremiumPricing premiumPricing;
-
-    public List<ProductDTO> getAllProducts() {
+    public List<Product> getAllProducts() {
         return productRepository.findAll()
                 .stream()
-                .map(p -> new ProductDTO(p.getId(), p.getName(), p.getPrice()))
+                .map(this::convertEntityToModel)
                 .collect(Collectors.toList());
     }
 
-    public ProductDTO getProductById(Long id) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-        return new ProductDTO(product.getId(), product.getName(), product.getPrice());
+    public Product getProductById(Long id) {
+        ProductEntity entity = productRepository.findById(id).orElse(null);
+        return entity != null ? convertEntityToModel(entity) : null;
     }
 
-    public ProductDTO createProduct(String name, double basePrice) {
-        double finalPrice = standardPricing.getPrice(basePrice);
-        Product product = new Product(name, finalPrice);
-        product = productRepository.save(product);
-        return new ProductDTO(product.getId(), product.getName(), product.getPrice());
+    public Product createProduct(Product product) {
+        ProductEntity entity = convertModelToEntity(product);
+        ProductEntity savedEntity = productRepository.save(entity);
+        return convertEntityToModel(savedEntity);
     }
 
-    public double applyDiscount(Long productId, double discountPercentage) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-
-        double newPrice = discountPricing.applyDiscount(product.getPrice(), discountPercentage);
-        product.setPrice(newPrice);
-        productRepository.save(product);
-
-        return newPrice;
+    public void deleteProduct(Long id) {
+        productRepository.deleteById(id);
     }
 
-    public double applyPremium(Long productId, double premiumPercentage) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+    private Product convertEntityToModel(ProductEntity entity) {
+        ProductTypeEnum type = ProductTypeEnum.valueOf(entity.getProductType());
+        return ProductFactory.createProduct(type, entity.getName(), entity.getPrice());
+    }
 
-        double newPrice = premiumPricing.applyPremium(product.getPrice(), premiumPercentage);
-        product.setPrice(newPrice);
-        productRepository.save(product);
-
-        return newPrice;
+    private ProductEntity convertModelToEntity(Product model) {
+        ProductEntity entity = new ProductEntity();
+        entity.setName(model.getName());
+        entity.setPrice(model.getPrice());
+        entity.setProductType(model.getType().name());
+        return entity;
     }
 }

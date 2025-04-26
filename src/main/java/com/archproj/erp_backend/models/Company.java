@@ -19,11 +19,15 @@ public class Company {
     private String email;
 
     @Enumerated(EnumType.STRING)
-    private CompanyTypeEnum companyType;
+    private CompanyTypeEnum type;
 
     public Company(String name, String email, CompanyTypeEnum companyType) {
         this.name = name;
         this.email = email;
-        this.companyType = companyType;
+        this.type = companyType;
+    }
+
+    public CompanyTypeEnum getType(){
+        return this.type;
     }
 }

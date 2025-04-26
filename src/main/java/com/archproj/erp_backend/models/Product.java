@@ -1,33 +1,16 @@
 package com.archproj.erp_backend.models;
 
-import jakarta.persistence.*;
-import lombok.*;
+import com.archproj.erp_backend.utils.ProductTypeEnum;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name = "products")
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
-@ToString
-public class Product {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
+@NoArgsConstructor
+public abstract class Product {
     private String name;
+    private Double price;
 
-    @Column(nullable = false)
-    private double price;
-
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-    @JoinColumn(name = "company_id", nullable = false)
-    private Company company;
-
-    public Product(String name, double price) {
-        this.name = name;
-        this.price = price;
-    }
+    public abstract ProductTypeEnum getType();
 }

@@ -1,12 +1,10 @@
 package com.archproj.erp_backend.services;
 
-import com.archproj.erp_backend.dtos.CustomerDTO;
+import com.archproj.erp_backend.entities.CustomerEntity;
 import com.archproj.erp_backend.factories.CustomerFactory;
-import com.archproj.erp_backend.mappers.DTOMapper;
 import com.archproj.erp_backend.models.Customer;
 import com.archproj.erp_backend.repositories.CustomerRepository;
 import com.archproj.erp_backend.utils.CustomerTypeEnum;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,25 +13,44 @@ import java.util.stream.Collectors;
 @Service
 public class CustomerService {
 
-    @Autowired
-    private CustomerRepository customerRepository;
+    private final CustomerRepository customerRepository;
 
-    public List<CustomerDTO> getAllCustomers() {
+    public CustomerService(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
+    }
+
+    public List<Customer> getAllCustomers() {
         return customerRepository.findAll()
                 .stream()
-                .map(DTOMapper::toCustomerDTO)
+                .map(this::convertEntityToModel)
                 .collect(Collectors.toList());
     }
 
-    public CustomerDTO getCustomerById(Long id) {
-        Customer customer = customerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
-        return DTOMapper.toCustomerDTO(customer);
+    public Customer getCustomerById(Long id) {
+        CustomerEntity entity = customerRepository.findById(id).orElse(null);
+        return entity != null ? convertEntityToModel(entity) : null;
     }
 
-    public CustomerDTO createCustomer(CustomerTypeEnum type, String name, String email) {
-        Customer customer = CustomerFactory.createCustomer(type, name, email);
-        customer = customerRepository.save(customer);
-        return DTOMapper.toCustomerDTO(customer);
+    public Customer createCustomer(Customer customer) {
+        CustomerEntity entity = convertModelToEntity(customer);
+        CustomerEntity savedEntity = customerRepository.save(entity);
+        return convertEntityToModel(savedEntity);
+    }
+
+    public void deleteCustomer(Long id) {
+        customerRepository.deleteById(id);
+    }
+
+    private Customer convertEntityToModel(CustomerEntity entity) {
+        CustomerTypeEnum type = CustomerTypeEnum.valueOf(entity.getCustomerType());
+        return CustomerFactory.createCustomer(type, entity.getName(), entity.getEmail());
+    }
+
+    private CustomerEntity convertModelToEntity(Customer model) {
+        CustomerEntity entity = new CustomerEntity();
+        entity.setName(model.getName());
+        entity.setEmail(model.getEmail());
+        entity.setCustomerType(model.getType().name());
+        return entity;
     }
 }
