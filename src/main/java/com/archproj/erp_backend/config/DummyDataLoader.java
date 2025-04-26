@@ -39,7 +39,7 @@ public class DummyDataLoader {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
     }
-
+    // undo this line to generate dummy data to db file
     //@PostConstruct
     public void loadDummyData() {
         loadCompanies();
