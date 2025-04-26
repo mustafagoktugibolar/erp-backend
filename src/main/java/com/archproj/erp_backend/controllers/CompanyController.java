@@ -1,3 +1,5 @@
+package com.archproj.erp_backend.controllers;
+
 import com.archproj.erp_backend.dtos.CompanyDTO;
 import com.archproj.erp_backend.services.CompanyService;
 import com.archproj.erp_backend.utils.CompanyTypeEnum;
