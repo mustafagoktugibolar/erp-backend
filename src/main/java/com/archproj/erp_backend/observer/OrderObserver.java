@@ -1,5 +1,7 @@
 package com.archproj.erp_backend.observer;
 
+import com.archproj.erp_backend.entities.OrderEntity;
+
 public interface OrderObserver {
-    void update(String message);
+    void onOrderCreated(OrderEntity order);
 }

@@ -25,6 +25,8 @@ public class OrderEntity {
 
     private Double totalAmount;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderItemEntity> items;
+    @ElementCollection
+    @CollectionTable(name = "order_items", joinColumns = @JoinColumn(name = "order_id"))
+    @Column(name = "item_id")
+    private List<Long> itemIds;
 }

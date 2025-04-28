@@ -1,13 +1,12 @@
 package com.archproj.erp_backend.services;
 
 import com.archproj.erp_backend.entities.OrderEntity;
-import com.archproj.erp_backend.entities.OrderItemEntity;
 import com.archproj.erp_backend.factories.OrderFactory;
 import com.archproj.erp_backend.models.Order;
-import com.archproj.erp_backend.models.OrderItem;
-import com.archproj.erp_backend.repositories.OrderRepository;
-import lombok.RequiredArgsConstructor;
+import com.archproj.erp_backend.observer.OrderObserver;
 import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
+import com.archproj.erp_backend.repositories.OrderRepository;
 
 import java.util.List;
 
@@ -16,6 +15,7 @@ import java.util.List;
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final List<OrderObserver> observers;
 
     public List<OrderEntity> getAllOrders() {
         return orderRepository.findAll();
@@ -28,78 +28,34 @@ public class OrderService {
 
     public OrderEntity createOrder(Order order) {
         OrderEntity orderEntity = OrderFactory.createOrder(order);
-        return orderRepository.save(orderEntity);
+        OrderEntity savedOrder = orderRepository.save(orderEntity);
+        observers.forEach(observer -> observer.onOrderCreated(savedOrder)); // ⭐
+        return savedOrder;
     }
 
     public void deleteOrder(Long id) {
         orderRepository.deleteById(id);
     }
 
-    public OrderEntity addItemToOrder(Long orderId, OrderItem orderItem) {
+    public OrderEntity addItemToOrder(Long orderId, Long itemId) {
         OrderEntity order = getOrderById(orderId);
 
-        OrderItemEntity itemEntity = new OrderItemEntity();
-        itemEntity.setProductId(orderItem.getProductId());
-        itemEntity.setProductName(orderItem.getProductName());
-        itemEntity.setQuantity(orderItem.getQuantity());
-        itemEntity.setUnitPrice(orderItem.getUnitPrice());
-        itemEntity.setTotalPrice(orderItem.getQuantity() * orderItem.getUnitPrice());
-        itemEntity.setOrder(order);
-
-        order.getItems().add(itemEntity);
-
-        // totalAmount güncelle
-        double newTotal = order.getItems().stream()
-                .mapToDouble(OrderItemEntity::getTotalPrice)
-                .sum();
-        order.setTotalAmount(newTotal);
-
-        return orderRepository.save(order);
-    }
-
-    public OrderEntity updateItemInOrder(Long orderId, Long itemId, OrderItem orderItem) {
-        OrderEntity order = getOrderById(orderId);
-
-        OrderItemEntity itemEntity = order.getItems().stream()
-                .filter(i -> i.getId().equals(itemId))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("OrderItem not found with id: " + itemId));
-
-        itemEntity.setProductId(orderItem.getProductId());
-        itemEntity.setProductName(orderItem.getProductName());
-        itemEntity.setQuantity(orderItem.getQuantity());
-        itemEntity.setUnitPrice(orderItem.getUnitPrice());
-        itemEntity.setTotalPrice(orderItem.getQuantity() * orderItem.getUnitPrice());
-
-        // totalAmount güncelle
-        double newTotal = order.getItems().stream()
-                .mapToDouble(OrderItemEntity::getTotalPrice)
-                .sum();
-        order.setTotalAmount(newTotal);
-
+        order.getItemIds().add(itemId);
         return orderRepository.save(order);
     }
 
     public OrderEntity removeItemFromOrder(Long orderId, Long itemId) {
         OrderEntity order = getOrderById(orderId);
 
-        boolean removed = order.getItems().removeIf(item -> item.getId().equals(itemId));
+        boolean removed = order.getItemIds().remove(itemId);
         if (!removed) {
-            throw new RuntimeException("OrderItem not found with id: " + itemId);
+            throw new RuntimeException("Item not found in order: " + itemId);
         }
-
-        // totalAmount güncelle
-        double newTotal = order.getItems().stream()
-                .mapToDouble(OrderItemEntity::getTotalPrice)
-                .sum();
-        order.setTotalAmount(newTotal);
-
         return orderRepository.save(order);
     }
 
-    public List<OrderItemEntity> getOrderItems(Long orderId) {
+    public List<Long> getOrderItems(Long orderId) {
         OrderEntity order = getOrderById(orderId);
-        return order.getItems();
+        return order.getItemIds();
     }
-
 }

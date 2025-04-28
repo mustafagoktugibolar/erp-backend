@@ -23,29 +23,26 @@ public class DummyDataLoader {
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
-    private final OrderItemRepository orderItemRepository;
     private final Random random = new Random();
 
     public DummyDataLoader(
             CompanyRepository companyRepository,
             CustomerRepository customerRepository,
             ProductRepository productRepository,
-            OrderRepository orderRepository,
-            OrderItemRepository orderItemRepository
+            OrderRepository orderRepository
     ) {
         this.companyRepository = companyRepository;
         this.customerRepository = customerRepository;
         this.productRepository = productRepository;
         this.orderRepository = orderRepository;
-        this.orderItemRepository = orderItemRepository;
     }
-    // undo this line to generate dummy data to db file
-    //@PostConstruct
+
+     @PostConstruct // Dummy data için açılır
     public void loadDummyData() {
         loadCompanies();
         loadCustomers();
         loadProducts();
-        loadOrdersAndOrderItems();
+        loadOrders();
     }
 
     private void loadCompanies() {
@@ -79,7 +76,7 @@ public class DummyDataLoader {
         IntStream.rangeClosed(1, 50).forEach(i -> {
             ProductEntity product = new ProductEntity();
             product.setName("Product " + i);
-            product.setPrice(Math.round((50 + random.nextDouble() * 950) * 100.0) / 100.0); // 50 - 1000 range
+            product.setPrice(Math.round((50 + random.nextDouble() * 950) * 100.0) / 100.0); // 50 - 1000 arası fiyat
             product.setProductType(randomEnumValue(ProductTypeEnum.class));
             products.add(product);
         });
@@ -87,12 +84,10 @@ public class DummyDataLoader {
         LogHelper.info(products.size() + " products created.");
     }
 
-    private void loadOrdersAndOrderItems() {
+    private void loadOrders() {
         List<CustomerEntity> customers = customerRepository.findAll();
-        List<ProductEntity> products = productRepository.findAll();
 
         List<OrderEntity> orders = new ArrayList<>();
-        List<OrderItemEntity> orderItems = new ArrayList<>();
 
         IntStream.rangeClosed(1, 100).forEach(i -> {
             OrderEntity order = new OrderEntity();
@@ -101,40 +96,26 @@ public class DummyDataLoader {
             order.setStatus(OrderStatusEnum.CREATED);
             order.setTotalAmount(0.0);
 
+            List<Long> itemIds = new ArrayList<>();
+
+            int numberOfItems = 1 + random.nextInt(5);
+
+            for (int j = 0; j < numberOfItems; j++) {
+                long randomItemId = 1 + random.nextInt(50); // Example: random ID
+                itemIds.add(randomItemId);
+            }
+
+            order.setItemIds(itemIds);
+
             orders.add(order);
         });
 
         orderRepository.saveAll(orders);
 
-        orders.forEach(order -> {
-            int numberOfItems = 1 + random.nextInt(5);
-            double totalAmount = 0.0;
-
-            for (int j = 0; j < numberOfItems; j++) {
-                ProductEntity product = products.get(random.nextInt(products.size()));
-                int quantity = 1 + random.nextInt(10);
-                double unitPrice = product.getPrice();
-                double totalPrice = unitPrice * quantity;
-
-                OrderItemEntity item = new OrderItemEntity();
-                item.setOrder(order);
-                item.setProductId(product.getId());
-                item.setProductName(product.getName());
-                item.setQuantity(quantity);
-                item.setUnitPrice(unitPrice);
-                item.setTotalPrice(Math.round(totalPrice * 100.0) / 100.0); // İki ondalık
-
-                totalAmount += totalPrice;
-                orderItems.add(item);
-            }
-
-            order.setTotalAmount(Math.round(totalAmount * 100.0) / 100.0);
-        });
-
-        orderItemRepository.saveAll(orderItems);
-
-        LogHelper.info(orders.size() + " orders and " + orderItems.size() + " order items created.");
+        LogHelper.info(orders.size() + " orders created with item IDs.");
     }
+
+
 
     private String generateCompanyName(int index) {
         String[] prefixes = {"Tech", "Global", "Solutions", "Dynamics", "Systems", "Innovations", "Industries", "Holdings"};

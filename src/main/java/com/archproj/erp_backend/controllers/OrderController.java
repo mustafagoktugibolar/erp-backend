@@ -1,10 +1,9 @@
 package com.archproj.erp_backend.controllers;
 
 import com.archproj.erp_backend.entities.OrderEntity;
-import com.archproj.erp_backend.entities.OrderItemEntity;
-import com.archproj.erp_backend.models.Order;
-import com.archproj.erp_backend.models.OrderItem;
 import com.archproj.erp_backend.services.OrderService;
+import com.archproj.erp_backend.models.Order;
+import com.archproj.erp_backend.services.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +15,7 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
+    private final PaymentService paymentService;
 
     @GetMapping
     public List<OrderEntity> getAllOrders() {
@@ -36,14 +36,10 @@ public class OrderController {
     public void deleteOrder(@PathVariable Long id) {
         orderService.deleteOrder(id);
     }
-    @PostMapping("/{orderId}/items")
-    public OrderEntity addItemToOrder(@PathVariable Long orderId, @RequestBody OrderItem orderItem) {
-        return orderService.addItemToOrder(orderId, orderItem);
-    }
 
-    @PutMapping("/{orderId}/items/{itemId}")
-    public OrderEntity updateItemInOrder(@PathVariable Long orderId, @PathVariable Long itemId, @RequestBody OrderItem orderItem) {
-        return orderService.updateItemInOrder(orderId, itemId, orderItem);
+    @PostMapping("/{orderId}/items")
+    public OrderEntity addItemToOrder(@PathVariable Long orderId, @RequestBody Long itemId) {
+        return orderService.addItemToOrder(orderId, itemId);
     }
 
     @DeleteMapping("/{orderId}/items/{itemId}")
@@ -52,7 +48,14 @@ public class OrderController {
     }
 
     @GetMapping("/{orderId}/items")
-    public List<OrderItemEntity> getOrderItems(@PathVariable Long orderId) {
+    public List<Long> getOrderItems(@PathVariable Long orderId) {
         return orderService.getOrderItems(orderId);
     }
+
+    @PostMapping("/{orderId}/pay")
+    public void payOrder(@PathVariable Long orderId, @RequestParam String method) {
+        OrderEntity order = orderService.getOrderById(orderId);
+        paymentService.pay(method, orderId, order.getTotalAmount());
+    }
+
 }

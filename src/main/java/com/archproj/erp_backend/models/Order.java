@@ -1,6 +1,5 @@
 package com.archproj.erp_backend.models;
 
-import com.archproj.erp_backend.utils.OrderStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,11 +11,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Order {
-
     private Long id;
     private Long customerId;
     private LocalDateTime orderDate;
-    private OrderStatusEnum status;
+    private String status;
     private Double totalAmount;
-    private List<OrderItem> items;
+    private List<Long> itemIds;
 }
