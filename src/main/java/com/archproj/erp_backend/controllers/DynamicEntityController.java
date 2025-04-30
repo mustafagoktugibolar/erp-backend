@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/dynamic")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 public class DynamicEntityController {
 
     private final DynamicEntityService dynamicEntityService;
