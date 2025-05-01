@@ -2,10 +2,7 @@ package com.archproj.erp_backend.config;
 
 import com.archproj.erp_backend.entities.*;
 import com.archproj.erp_backend.repositories.*;
-import com.archproj.erp_backend.utils.CompanyTypeEnum;
-import com.archproj.erp_backend.utils.CustomerTypeEnum;
-import com.archproj.erp_backend.utils.OrderStatusEnum;
-import com.archproj.erp_backend.utils.ProductTypeEnum;
+import com.archproj.erp_backend.utils.*;
 import com.archproj.erp_backend.helper.LogHelper;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
@@ -23,18 +20,21 @@ public class DummyDataLoader {
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
+    private final ModuleRepository moduleRepository;
     private final Random random = new Random();
 
     public DummyDataLoader(
             CompanyRepository companyRepository,
             CustomerRepository customerRepository,
             ProductRepository productRepository,
-            OrderRepository orderRepository
+            OrderRepository orderRepository,
+            ModuleRepository moduleRepository
     ) {
         this.companyRepository = companyRepository;
         this.customerRepository = customerRepository;
         this.productRepository = productRepository;
         this.orderRepository = orderRepository;
+        this.moduleRepository = moduleRepository;
     }
 
      //@PostConstruct // Dummy data için açılır
@@ -43,8 +43,31 @@ public class DummyDataLoader {
         loadCustomers();
         loadProducts();
         loadOrders();
+        loadModules();
     }
 
+    private void loadModules() {
+        List<ModuleEntity> modules = List.of(
+                createModule("Companies", "companies", "/companies", "business", ModuleTypes.CREATION.name()),
+                createModule("Customers", "customers", "/customers", "people", ModuleTypes.CREATION.name()),
+                createModule("Products", "products", "/products", "inventory_2", ModuleTypes.CREATION.name()),
+                createModule("Orders", "orders", "/orders", "receipt_long", ModuleTypes.CREATION.name()),
+                createModule("Invoices", "invoices", "/invoices", "receipt", ModuleTypes.CREATION.name())
+        );
+
+        moduleRepository.saveAll(modules);
+        LogHelper.info(modules.size() + " default modules created.");
+    }
+
+    private ModuleEntity createModule(String name, String key, String route, String icon, String type) {
+        ModuleEntity module = new ModuleEntity();
+        module.setName(name);
+        module.setKey(key);
+        module.setRoute(route);
+        module.setIcon(icon);
+        module.setType(type);
+        return module;
+    }
     private void loadCompanies() {
         List<CompanyEntity> companies = new ArrayList<>();
         IntStream.rangeClosed(1, 50).forEach(i -> {

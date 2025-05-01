@@ -1,9 +1,10 @@
 package com.archproj.erp_backend.repositories;
 
-import com.archproj.erp_backend.entities.InvoiceEntity;
+import com.archproj.erp_backend.entities.ModuleEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface InvoiceRepository extends JpaRepository<InvoiceEntity, Long> {
+public interface ModuleRepository extends JpaRepository<ModuleEntity, Long> {
+
 }
