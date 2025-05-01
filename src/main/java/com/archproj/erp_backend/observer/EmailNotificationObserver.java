@@ -12,4 +12,9 @@ public class EmailNotificationObserver implements OrderObserver {
         // TEMP
         LogHelper.info("Email sent to customer for order ID: " + order.getId());
     }
+
+    @Override
+    public void onOrderCompleted(OrderEntity order) {
+        LogHelper.info("Email sent to customer for order ID: " + order.getId());
+    }
 }

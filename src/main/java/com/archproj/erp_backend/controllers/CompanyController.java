@@ -8,7 +8,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/companies")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(
+        origins = "http://localhost:3000",
+        methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS},
+        allowedHeaders = "*"
+)
 public class CompanyController {
 
     private final CompanyService companyService;
@@ -30,6 +34,14 @@ public class CompanyController {
     @PostMapping
     public Company createCompany(@RequestBody Company company) {
         return companyService.createCompany(company);
+    }
+
+    @PutMapping("/{id}")
+    public Company updateCompany(
+            @PathVariable Long id,
+            @RequestBody Company companyPayload
+    ) {
+        return companyService.updateCompany(id, companyPayload);
     }
 
     @DeleteMapping("/{id}")

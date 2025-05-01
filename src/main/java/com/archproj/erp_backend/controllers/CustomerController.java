@@ -3,14 +3,23 @@ package com.archproj.erp_backend.controllers;
 import com.archproj.erp_backend.factories.CustomerFactory;
 import com.archproj.erp_backend.models.Customer;
 import com.archproj.erp_backend.services.CustomerService;
-import com.archproj.erp_backend.utils.CustomerTypeEnum;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/customers")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(
+        origins = "http://localhost:3000",
+        methods = {
+                RequestMethod.GET,
+                RequestMethod.POST,
+                RequestMethod.PUT,
+                RequestMethod.DELETE,
+                RequestMethod.OPTIONS
+        },
+        allowedHeaders = "*"
+)
 public class CustomerController {
 
     private final CustomerService customerService;
@@ -30,11 +39,30 @@ public class CustomerController {
     }
 
     @PostMapping
-    public Customer createCustomer(@RequestParam CustomerTypeEnum type,
-                                   @RequestParam String name,
-                                   @RequestParam String email) {
-        Customer customer = CustomerFactory.createCustomer(type, name, email);
+    public Customer createCustomer(@RequestBody Customer payload) {
+        // use factory to build our domain object
+        Customer customer = CustomerFactory.createCustomer(
+                payload.getType(),
+                payload.getName(),
+                payload.getEmail()
+        );
         return customerService.createCustomer(customer);
+    }
+
+    @PutMapping("/{id}")
+    public Customer editCustomer(
+            @PathVariable Long id,
+            @RequestBody Customer payload
+    ) {
+        // factory produces the correct subclass/validation
+        Customer customer = CustomerFactory.createCustomer(
+                payload.getType(),
+                payload.getName(),
+                payload.getEmail()
+        );
+        // now set the existing PK so service.save will update
+        customer.setId(id);
+        return customerService.updateCustomer(customer);
     }
 
     @DeleteMapping("/{id}")

@@ -40,6 +40,21 @@ public class CompanyService {
         companyRepository.deleteById(id);
     }
 
+    public Company updateCompany(Long id, Company payload) {
+        // 1) fetch existing entity (or throw if not found)
+        CompanyEntity entity = companyRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Company not found: " + id));
+
+        // 2) copy over the updatable fields
+        entity.setName(payload.getName());
+        entity.setEmail(payload.getEmail());
+        entity.setType(payload.getType().name());
+
+        // 3) save & convert back to model
+        CompanyEntity saved = companyRepository.save(entity);
+        return convertEntityToModel(saved);
+    }
+
     // In CompanyService
     private Company convertEntityToModel(CompanyEntity entity) {
         Company company = new Company(entity.getName(), entity.getEmail(), CompanyTypeEnum.valueOf(entity.getType()));

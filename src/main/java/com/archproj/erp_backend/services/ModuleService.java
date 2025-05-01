@@ -66,7 +66,6 @@ public class ModuleService {
 
     private ModuleEntity convertModelToEntity(ModuleInfo model) {
         ModuleEntity entity = new ModuleEntity();
-        entity.setId(model.getId());
         entity.setName(model.getName());
         entity.setKey(model.getKey());
         entity.setRoute(model.getRoute());

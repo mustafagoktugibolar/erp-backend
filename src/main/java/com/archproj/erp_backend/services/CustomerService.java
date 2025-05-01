@@ -37,6 +37,19 @@ public class CustomerService {
         return convertEntityToModel(savedEntity);
     }
 
+    public Customer updateCustomer(Customer customer) {
+        // load existing, copy fields, save
+        CustomerEntity e = customerRepository.findById(customer.getId())
+                .orElseThrow(() -> new RuntimeException("Customer not found: " + customer.getId()));
+
+        e.setName(customer.getName());
+        e.setEmail(customer.getEmail());
+        e.setCustomerType(customer.getType().name());
+
+        CustomerEntity saved = customerRepository.save(e);
+        return convertEntityToModel(saved);
+    }
+
     public void deleteCustomer(Long id) {
         customerRepository.deleteById(id);
     }

@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,4 +17,5 @@ public class ModuleInfo {
     private String icon;
     private String route;
     private ModuleTypes type;
+    private List<ColumnInfo> columns;
 }

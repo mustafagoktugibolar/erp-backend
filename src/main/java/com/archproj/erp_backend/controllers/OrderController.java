@@ -19,17 +19,17 @@ public class OrderController {
     private final PaymentService paymentService;
 
     @GetMapping
-    public List<OrderEntity> getAllOrders() {
+    public List<Order> getAllOrders() {
         return orderService.getAllOrders();
     }
 
     @GetMapping("/{id}")
-    public OrderEntity getOrderById(@PathVariable Long id) {
+    public Order getOrderById(@PathVariable Long id) {
         return orderService.getOrderById(id);
     }
 
     @PostMapping
-    public OrderEntity createOrder(@RequestBody Order order) {
+    public Order createOrder(@RequestBody Order order) {
         return orderService.createOrder(order);
     }
 
@@ -39,12 +39,16 @@ public class OrderController {
     }
 
     @PostMapping("/{orderId}/items")
-    public OrderEntity addItemToOrder(@PathVariable Long orderId, @RequestBody Long itemId) {
+    public Order addItemToOrder(@PathVariable Long orderId, @RequestBody Long itemId) {
         return orderService.addItemToOrder(orderId, itemId);
+    }
+    @PutMapping("/{id}")
+    public Order updateOrder(@PathVariable Long id, @RequestBody Order order) {
+        return orderService.updateOrder(id, order);
     }
 
     @DeleteMapping("/{orderId}/items/{itemId}")
-    public OrderEntity removeItemFromOrder(@PathVariable Long orderId, @PathVariable Long itemId) {
+    public Order removeItemFromOrder(@PathVariable Long orderId, @PathVariable Long itemId) {
         return orderService.removeItemFromOrder(orderId, itemId);
     }
 
@@ -55,7 +59,7 @@ public class OrderController {
 
     @PostMapping("/{orderId}/pay")
     public void payOrder(@PathVariable Long orderId, @RequestParam String method) {
-        OrderEntity order = orderService.getOrderById(orderId);
+        Order order = orderService.getOrderById(orderId);
         paymentService.pay(method, orderId, order.getTotalAmount());
     }
 

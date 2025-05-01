@@ -1,3 +1,4 @@
+// src/main/java/com/archproj/erp_backend/services/ProductService.java
 package com.archproj.erp_backend.services;
 
 import com.archproj.erp_backend.entities.ProductEntity;
@@ -12,7 +13,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
-
     private final ProductRepository productRepository;
 
     public ProductService(ProductRepository productRepository) {
@@ -27,14 +27,15 @@ public class ProductService {
     }
 
     public Product getProductById(Long id) {
-        ProductEntity entity = productRepository.findById(id).orElse(null);
-        return entity != null ? convertEntityToModel(entity) : null;
+        return productRepository.findById(id)
+                .map(this::convertEntityToModel)
+                .orElse(null);
     }
 
     public Product createProduct(Product product) {
         ProductEntity entity = convertModelToEntity(product);
-        ProductEntity savedEntity = productRepository.save(entity);
-        return convertEntityToModel(savedEntity);
+        ProductEntity saved = productRepository.save(entity);
+        return convertEntityToModel(saved);
     }
 
     public void deleteProduct(Long id) {
@@ -43,11 +44,16 @@ public class ProductService {
 
     private Product convertEntityToModel(ProductEntity entity) {
         ProductTypeEnum type = ProductTypeEnum.valueOf(entity.getProductType());
-        return ProductFactory.createProduct(type, entity.getName(), entity.getPrice());
+        Product model = ProductFactory.createProduct(type, entity.getName(), entity.getPrice());
+        model.setId(entity.getId());
+        return model;
     }
 
     private ProductEntity convertModelToEntity(Product model) {
         ProductEntity entity = new ProductEntity();
+        if (model.getId() != null) {
+            entity.setId(model.getId());
+        }
         entity.setName(model.getName());
         entity.setPrice(model.getPrice());
         entity.setProductType(model.getType().name());

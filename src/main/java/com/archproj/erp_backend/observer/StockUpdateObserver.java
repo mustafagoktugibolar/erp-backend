@@ -12,4 +12,9 @@ public class StockUpdateObserver implements OrderObserver {
         // TEMP
         LogHelper.info("Stock updated for order ID: " + order.getId());
     }
+
+    @Override
+    public void onOrderCompleted(OrderEntity order) {
+        LogHelper.info("Stock updated for order ID: " + order.getId());
+    }
 }
