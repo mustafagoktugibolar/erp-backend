@@ -4,6 +4,9 @@ import com.archproj.erp_backend.utils.CustomerTypeEnum;
 
 public class IndividualCustomer extends Customer {
 
+    public IndividualCustomer(Long id, String name, String email) {
+        super(id, name, email);
+    }
     public IndividualCustomer(String name, String email) {
         super(name, email);
     }

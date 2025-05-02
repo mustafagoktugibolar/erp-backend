@@ -56,7 +56,7 @@ public class CustomerService {
 
     private Customer convertEntityToModel(CustomerEntity entity) {
         CustomerTypeEnum type = CustomerTypeEnum.valueOf(entity.getCustomerType());
-        return CustomerFactory.createCustomer(type, entity.getName(), entity.getEmail());
+        return CustomerFactory.createCustomer(entity.getId(), type, entity.getName(), entity.getEmail());
     }
 
     private CustomerEntity convertModelToEntity(Customer model) {
