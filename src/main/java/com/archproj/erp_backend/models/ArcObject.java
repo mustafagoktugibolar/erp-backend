@@ -1,6 +1,9 @@
 package com.archproj.erp_backend.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,7 +15,8 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ArcObject {
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long arc_object_id;
     private Long moduleId;
     @JsonProperty("data")

@@ -5,7 +5,6 @@ import com.archproj.erp_backend.services.ArcObjectService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/modules/{moduleId}/objects")
@@ -39,12 +38,8 @@ public class ArcObjectController {
     }
 
     @PostMapping
-    public ArcObject create(
-            @PathVariable Long moduleId,
-            @RequestBody ArcObject payload
-    ) {
-        payload.setModuleId(moduleId);
-        return arcObjectService.save(payload); // Insert because ID is null
+    public ArcObject create(@RequestBody ArcObject payload) {
+        return arcObjectService.save(payload);
     }
 
     @PutMapping("/{id}")
