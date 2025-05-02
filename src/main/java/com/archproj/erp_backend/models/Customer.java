@@ -1,25 +1,35 @@
 package com.archproj.erp_backend.models;
 
 import com.archproj.erp_backend.utils.CustomerTypeEnum;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.management.ConstructorParameters;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public abstract class Customer {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class Customer {
     private Long id;
     private String name;
     private String email;
-    public abstract CustomerTypeEnum getType();
+    private CustomerTypeEnum type;
 
-    public Customer(String name, String email) {}
+    public Customer(String name, String email) {
+        this.name = name;
+        this.email = email;
+        this.type = getType();
+    }
+
+    public Customer(Long id, String name, String email) {
+        this.id              = id;
+        this.name            = name;
+        this.email           = email;
+        this.type = getType();
+    }
+
+    public CustomerTypeEnum getType(){
+        return CustomerTypeEnum.INDIVIDUAL;
+    }
 }
+

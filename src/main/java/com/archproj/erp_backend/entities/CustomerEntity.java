@@ -14,5 +14,5 @@ public class CustomerEntity {
 
     private String name;
     private String email;
-    private String customerType;
+    private String type;
 }

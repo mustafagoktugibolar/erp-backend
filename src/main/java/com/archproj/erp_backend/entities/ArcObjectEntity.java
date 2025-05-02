@@ -20,7 +20,7 @@ public class ArcObjectEntity {
     private Long moduleId;
 
     @ElementCollection
-    @CollectionTable(name = "arc_object_data", joinColumns = @JoinColumn(name = "arc_object_id"))
+    @CollectionTable(name = "arc_object_data", joinColumns = @JoinColumn(name = "id"))
     @MapKeyColumn(name = "data_key")
     @Column(name = "data_value")
     private Map<String, String> data = new HashMap<>();

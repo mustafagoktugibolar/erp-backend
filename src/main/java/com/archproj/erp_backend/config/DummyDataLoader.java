@@ -37,7 +37,7 @@ public class DummyDataLoader {
         this.moduleRepository = moduleRepository;
     }
 
-     //@PostConstruct // Dummy data için açılır
+     @PostConstruct // Dummy data için açılır
     public void loadDummyData() {
         loadCompanies();
         loadCustomers();
@@ -87,7 +87,7 @@ public class DummyDataLoader {
             CustomerEntity customer = new CustomerEntity();
             customer.setName("Customer " + i);
             customer.setEmail("customer" + i + "@mail.com");
-            customer.setCustomerType(randomEnumValue(CustomerTypeEnum.class));
+            customer.setType(randomEnumValue(CustomerTypeEnum.class));
             customers.add(customer);
         });
         customerRepository.saveAll(customers);

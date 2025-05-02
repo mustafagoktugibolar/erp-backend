@@ -1,5 +1,6 @@
 package com.archproj.erp_backend.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,8 +13,9 @@ import java.util.Map;
 @NoArgsConstructor
 public class ArcObject {
 
-    private Long id;
+    private Long arc_object_id;
     private Long moduleId;
+    @JsonProperty("data")
     private Map<String, Object> data = new HashMap<>();
 
     public Object get(String key) {

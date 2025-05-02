@@ -52,7 +52,7 @@ public class ArcObjectService {
 
     private ArcObject convertEntityToModel(ArcObjectEntity entity) {
         ArcObject model = new ArcObject();
-        model.setId(entity.getId());
+        model.setArc_object_id(entity.getId());
         model.setModuleId(entity.getModuleId());
         model.setData(new HashMap<>(entity.getData())); // Currently Map<String, String>
         return model;
@@ -60,7 +60,7 @@ public class ArcObjectService {
 
     private ArcObjectEntity convertModelToEntity(ArcObject model) {
         ArcObjectEntity entity = new ArcObjectEntity();
-        entity.setId(model.getId());
+        entity.setId(model.getArc_object_id());
         entity.setModuleId(model.getModuleId());
 
         Map<String, String> convertedMap = model.getData().entrySet().stream()

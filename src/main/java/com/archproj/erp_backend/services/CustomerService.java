@@ -44,7 +44,7 @@ public class CustomerService {
 
         e.setName(customer.getName());
         e.setEmail(customer.getEmail());
-        e.setCustomerType(customer.getType().name());
+        e.setType(customer.getType().name());
 
         CustomerEntity saved = customerRepository.save(e);
         return convertEntityToModel(saved);
@@ -55,7 +55,7 @@ public class CustomerService {
     }
 
     private Customer convertEntityToModel(CustomerEntity entity) {
-        CustomerTypeEnum type = CustomerTypeEnum.valueOf(entity.getCustomerType());
+        CustomerTypeEnum type = CustomerTypeEnum.valueOf(entity.getType());
         return CustomerFactory.createCustomer(entity.getId(), type, entity.getName(), entity.getEmail());
     }
 
@@ -63,7 +63,7 @@ public class CustomerService {
         CustomerEntity entity = new CustomerEntity();
         entity.setName(model.getName());
         entity.setEmail(model.getEmail());
-        entity.setCustomerType(model.getType().name());
+        entity.setType(model.getType().name());
         return entity;
     }
 }

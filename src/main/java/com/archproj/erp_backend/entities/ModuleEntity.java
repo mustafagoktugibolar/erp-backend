@@ -3,6 +3,9 @@ package com.archproj.erp_backend.entities;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @Entity
 @Table(name = "modules")
@@ -17,4 +20,11 @@ public class ModuleEntity {
     private String route;    // Route path (e.g., "/products")
     private String icon;     // Icon name (e.g., "inventory_2")\
     private String type;
+
+    @OneToMany(
+            mappedBy = "module",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<ColumnEntity> columns = new ArrayList<>();
 }

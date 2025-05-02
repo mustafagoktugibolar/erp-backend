@@ -31,6 +31,10 @@ public class ModuleController {
     public void deleteModuleById(@PathVariable Long id) {
         moduleService.deleteModule(id);
     }
+    @PutMapping("/{moduleId}")
+    public ModuleInfo updateModule(@PathVariable Long moduleId, @RequestBody ModuleInfo moduleInfo) {
+        return moduleService.updateModule(moduleId, moduleInfo);
+    }
 
     @PostMapping
     public ModuleInfo addModule(@RequestBody ModuleInfo moduleInfo) {

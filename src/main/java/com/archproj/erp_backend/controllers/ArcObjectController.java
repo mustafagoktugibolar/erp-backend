@@ -5,12 +5,13 @@ import com.archproj.erp_backend.services.ArcObjectService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/modules/{moduleId}/objects")
 @CrossOrigin(
-        origins       = "http://localhost:3000",
-        methods       = {
+        origins = "http://localhost:3000",
+        methods = {
                 RequestMethod.GET,
                 RequestMethod.POST,
                 RequestMethod.PUT,
@@ -43,8 +44,7 @@ public class ArcObjectController {
             @RequestBody ArcObject payload
     ) {
         payload.setModuleId(moduleId);
-        // service.save will INSERT because payload.getId() is null
-        return arcObjectService.save(payload);
+        return arcObjectService.save(payload); // Insert because ID is null
     }
 
     @PutMapping("/{id}")
@@ -54,8 +54,8 @@ public class ArcObjectController {
             @RequestBody ArcObject payload
     ) {
         payload.setModuleId(moduleId);
-        payload.setId(id);
-        return arcObjectService.save(payload);
+        payload.setArc_object_id(id);
+        return arcObjectService.save(payload); // Update because ID is set
     }
 
     @DeleteMapping("/{id}")
