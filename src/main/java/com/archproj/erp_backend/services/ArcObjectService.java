@@ -29,10 +29,32 @@ public class ArcObjectService {
 
     @Transactional
     public ArcObject save(ArcObject model) {
-        ArcObjectEntity entity = convertModelToEntity(model);
+        ArcObjectEntity entity;
+
+        // Check if we're editing an existing one
+        if (model.getArc_object_id() != null) {
+            entity = arcObjectRepository.findById(model.getArc_object_id()).orElse(new ArcObjectEntity());
+        } else {
+            entity = new ArcObjectEntity();
+        }
+
+        // Update fields
+        entity.setId(model.getArc_object_id()); // may be null for insert
+        entity.setModuleId(model.getModuleId());
+
+        // Convert data (ensure String values)
+        Map<String, String> convertedMap = model.getData().entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> String.valueOf(e.getValue())
+                ));
+        entity.setData(convertedMap);
+
+        // Save and return result
         ArcObjectEntity savedEntity = arcObjectRepository.save(entity);
         return convertEntityToModel(savedEntity);
     }
+
 
 
     public ArcObject getByModuleIdAndId(Long moduleId, Long id) {

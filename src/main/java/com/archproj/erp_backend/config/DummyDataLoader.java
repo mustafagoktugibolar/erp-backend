@@ -37,7 +37,7 @@ public class DummyDataLoader {
         this.moduleRepository = moduleRepository;
     }
 
-    // @PostConstruct // Dummy data için açılır
+    //@PostConstruct // Dummy data için açılır
     public void loadDummyData() {
         loadCompanies();
         loadCustomers();
