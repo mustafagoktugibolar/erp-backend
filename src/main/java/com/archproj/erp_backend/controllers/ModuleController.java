@@ -8,7 +8,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/modules")
-@CrossOrigin(origins = "http://localhost:3000")
+
 public class ModuleController {
     private final ModuleService moduleService;
 
@@ -22,6 +22,7 @@ public class ModuleController {
         mi.addAll(moduleService.getAllModules());
         return moduleService.getAllModules();
     }
+
     @GetMapping("/{id}")
     public ModuleInfo getModuleById(@PathVariable Long id) {
         return moduleService.getModuleById(id);
@@ -31,6 +32,7 @@ public class ModuleController {
     public void deleteModuleById(@PathVariable Long id) {
         moduleService.deleteModule(id);
     }
+
     @PutMapping("/{moduleId}")
     public ModuleInfo updateModule(@PathVariable Long moduleId, @RequestBody ModuleInfo moduleInfo) {
         return moduleService.updateModule(moduleId, moduleInfo);

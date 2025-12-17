@@ -3,18 +3,20 @@ package com.archproj.erp_backend.config;
 import com.archproj.erp_backend.entities.*;
 import com.archproj.erp_backend.repositories.*;
 import com.archproj.erp_backend.utils.*;
-import com.archproj.erp_backend.helper.LogHelper;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.IntStream;
 
+@Slf4j
 @Component
-public class DummyDataLoader {
+@RequiredArgsConstructor
+public class DummyDataLoader implements CommandLineRunner {
 
     private final CompanyRepository companyRepository;
     private final CustomerRepository customerRepository;
@@ -23,21 +25,14 @@ public class DummyDataLoader {
     private final ModuleRepository moduleRepository;
     private final Random random = new Random();
 
-    public DummyDataLoader(
-            CompanyRepository companyRepository,
-            CustomerRepository customerRepository,
-            ProductRepository productRepository,
-            OrderRepository orderRepository,
-            ModuleRepository moduleRepository
-    ) {
-        this.companyRepository = companyRepository;
-        this.customerRepository = customerRepository;
-        this.productRepository = productRepository;
-        this.orderRepository = orderRepository;
-        this.moduleRepository = moduleRepository;
+    @Override
+    public void run(String... args) throws Exception {
+        if (companyRepository.count() == 0) {
+            loadDummyData();
+        }
     }
 
-    //@PostConstruct // Dummy data için açılır
+    // @PostConstruct // Dummy data için açılır
     public void loadDummyData() {
         loadCompanies();
         loadCustomers();
@@ -52,11 +47,10 @@ public class DummyDataLoader {
                 createModule("Customers", "customers", "/customers", "people", ModuleTypes.CREATION.name()),
                 createModule("Products", "products", "/products", "inventory_2", ModuleTypes.CREATION.name()),
                 createModule("Orders", "orders", "/orders", "receipt_long", ModuleTypes.CREATION.name()),
-                createModule("Invoices", "invoices", "/invoices", "receipt", ModuleTypes.CREATION.name())
-        );
+                createModule("Invoices", "invoices", "/invoices", "receipt", ModuleTypes.CREATION.name()));
 
         moduleRepository.saveAll(modules);
-        LogHelper.info(modules.size() + " default modules created.");
+        log.info(modules.size() + " default modules created.");
     }
 
     private ModuleEntity createModule(String name, String key, String route, String icon, String type) {
@@ -68,6 +62,7 @@ public class DummyDataLoader {
         module.setType(type);
         return module;
     }
+
     private void loadCompanies() {
         List<CompanyEntity> companies = new ArrayList<>();
         IntStream.rangeClosed(1, 50).forEach(i -> {
@@ -78,7 +73,7 @@ public class DummyDataLoader {
             companies.add(company);
         });
         companyRepository.saveAll(companies);
-        LogHelper.info(companies.size() + " companies created.");
+        log.info(companies.size() + " companies created.");
     }
 
     private void loadCustomers() {
@@ -91,7 +86,7 @@ public class DummyDataLoader {
             customers.add(customer);
         });
         customerRepository.saveAll(customers);
-        LogHelper.info(customers.size() + " customers created.");
+        log.info(customers.size() + " customers created.");
     }
 
     private void loadProducts() {
@@ -104,7 +99,7 @@ public class DummyDataLoader {
             products.add(product);
         });
         productRepository.saveAll(products);
-        LogHelper.info(products.size() + " products created.");
+        log.info(products.size() + " products created.");
     }
 
     private void loadOrders() {
@@ -135,19 +130,19 @@ public class DummyDataLoader {
 
         orderRepository.saveAll(orders);
 
-        LogHelper.info(orders.size() + " orders created with item IDs.");
+        log.info(orders.size() + " orders created with item IDs.");
     }
 
-
-
     private String generateCompanyName(int index) {
-        String[] prefixes = {"Tech", "Global", "Solutions", "Dynamics", "Systems", "Innovations", "Industries", "Holdings"};
-        String[] suffixes = {"Group", "Corp", "Inc", "LLC", "Ltd", "Networks", "Enterprises", "Technologies"};
-        return prefixes[random.nextInt(prefixes.length)] + " " + suffixes[random.nextInt(suffixes.length)] + " " + index;
+        String[] prefixes = { "Tech", "Global", "Solutions", "Dynamics", "Systems", "Innovations", "Industries",
+                "Holdings" };
+        String[] suffixes = { "Group", "Corp", "Inc", "LLC", "Ltd", "Networks", "Enterprises", "Technologies" };
+        return prefixes[random.nextInt(prefixes.length)] + " " + suffixes[random.nextInt(suffixes.length)] + " "
+                + index;
     }
 
     private String generateEmail(int index) {
-        String[] domains = {"example.com", "corp.com", "business.net", "startup.io", "company.org"};
+        String[] domains = { "example.com", "corp.com", "business.net", "startup.io", "company.org" };
         return "contact" + index + "@" + domains[random.nextInt(domains.length)];
     }
 

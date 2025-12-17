@@ -12,7 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000")
+
 public class OrderController {
 
     private final OrderService orderService;
@@ -42,6 +42,7 @@ public class OrderController {
     public Order addItemToOrder(@PathVariable Long orderId, @RequestBody Long itemId) {
         return orderService.addItemToOrder(orderId, itemId);
     }
+
     @PutMapping("/{id}")
     public Order updateOrder(@PathVariable Long id, @RequestBody Order order) {
         return orderService.updateOrder(id, order);

@@ -8,23 +8,16 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/modules/{moduleId}/objects")
-@CrossOrigin(
-        origins = "http://localhost:3000",
-        methods = {
-                RequestMethod.GET,
-                RequestMethod.POST,
-                RequestMethod.PUT,
-                RequestMethod.DELETE,
-                RequestMethod.OPTIONS
-        },
-        allowedHeaders = "*"
-)
+
 public class ArcObjectController {
 
     private final ArcObjectService arcObjectService;
+    private final com.archproj.erp_backend.services.ExcelService excelService;
 
-    public ArcObjectController(ArcObjectService arcObjectService) {
+    public ArcObjectController(ArcObjectService arcObjectService,
+            com.archproj.erp_backend.services.ExcelService excelService) {
         this.arcObjectService = arcObjectService;
+        this.excelService = excelService;
     }
 
     @GetMapping
@@ -42,12 +35,29 @@ public class ArcObjectController {
         return arcObjectService.save(payload);
     }
 
+    @PostMapping("/upload")
+    public List<ArcObject> uploadExcel(
+            @PathVariable Long moduleId,
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file) throws java.io.IOException {
+
+        List<java.util.Map<String, Object>> rows = excelService.parseExcelFile(file);
+        List<ArcObject> savedObjects = new java.util.ArrayList<>();
+
+        for (java.util.Map<String, Object> rowData : rows) {
+            ArcObject obj = new ArcObject();
+            obj.setModuleId(moduleId);
+            obj.setData(rowData);
+            savedObjects.add(arcObjectService.save(obj));
+        }
+
+        return savedObjects;
+    }
+
     @PutMapping("/{id}")
     public ArcObject edit(
             @PathVariable Long moduleId,
             @PathVariable Long id,
-            @RequestBody ArcObject payload
-    ) {
+            @RequestBody ArcObject payload) {
         payload.setModuleId(moduleId);
         payload.setArc_object_id(id);
         return arcObjectService.save(payload); // Update because ID is set
@@ -56,8 +66,7 @@ public class ArcObjectController {
     @DeleteMapping("/{id}")
     public void delete(
             @PathVariable Long moduleId,
-            @PathVariable Long id
-    ) {
+            @PathVariable Long id) {
         arcObjectService.deleteByModuleIdAndId(moduleId, id);
     }
 }

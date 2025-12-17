@@ -9,17 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/customers")
-@CrossOrigin(
-        origins = "http://localhost:3000",
-        methods = {
-                RequestMethod.GET,
-                RequestMethod.POST,
-                RequestMethod.PUT,
-                RequestMethod.DELETE,
-                RequestMethod.OPTIONS
-        },
-        allowedHeaders = "*"
-)
+
 public class CustomerController {
 
     private final CustomerService customerService;
@@ -44,22 +34,19 @@ public class CustomerController {
         Customer customer = CustomerFactory.createCustomer(
                 payload.getType(),
                 payload.getName(),
-                payload.getEmail()
-        );
+                payload.getEmail());
         return customerService.createCustomer(customer);
     }
 
     @PutMapping("/{id}")
     public Customer editCustomer(
             @PathVariable Long id,
-            @RequestBody Customer payload
-    ) {
+            @RequestBody Customer payload) {
         // factory produces the correct subclass/validation
         Customer customer = CustomerFactory.createCustomer(
                 payload.getType(),
                 payload.getName(),
-                payload.getEmail()
-        );
+                payload.getEmail());
         // now set the existing PK so service.save will update
         customer.setId(id);
         return customerService.updateCustomer(customer);

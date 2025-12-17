@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
-@CrossOrigin(origins = "http://localhost:3000")
+
 public class ProductController {
 
     private final ProductService productService;
@@ -31,8 +31,8 @@ public class ProductController {
 
     @PostMapping
     public Product createProduct(@RequestParam ProductTypeEnum type,
-                                 @RequestParam String name,
-                                 @RequestParam Double price) {
+            @RequestParam String name,
+            @RequestParam Double price) {
         Product product = ProductFactory.createProduct(type, name, price);
         return productService.createProduct(product);
     }

@@ -19,11 +19,8 @@ public class ArcObjectEntity {
     @Column(name = "module_id", nullable = false)
     private Long moduleId;
 
-    @ElementCollection
-    @CollectionTable(name = "arc_object_data", joinColumns = @JoinColumn(name = "id"))
-    @MapKeyColumn(name = "data_key")
-    @Column(name = "data_value")
-    private Map<String, String> data = new HashMap<>();
-
+    @Column(name = "data", columnDefinition = "TEXT")
+    @Convert(converter = com.archproj.erp_backend.utils.JpaJsonConverter.class)
+    private Map<String, Object> data = new HashMap<>();
 
 }

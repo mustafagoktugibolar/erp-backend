@@ -43,19 +43,12 @@ public class ArcObjectService {
         entity.setModuleId(model.getModuleId());
 
         // Convert data (ensure String values)
-        Map<String, String> convertedMap = model.getData().entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        e -> String.valueOf(e.getValue())
-                ));
-        entity.setData(convertedMap);
+        entity.setData(model.getData());
 
         // Save and return result
         ArcObjectEntity savedEntity = arcObjectRepository.save(entity);
         return convertEntityToModel(savedEntity);
     }
-
-
 
     public ArcObject getByModuleIdAndId(Long moduleId, Long id) {
         return arcObjectRepository.findById(id)
@@ -79,21 +72,5 @@ public class ArcObjectService {
         model.setData(new HashMap<>(entity.getData())); // Currently Map<String, String>
         return model;
     }
-
-    private ArcObjectEntity convertModelToEntity(ArcObject model) {
-        ArcObjectEntity entity = new ArcObjectEntity();
-        entity.setId(model.getArc_object_id());
-        entity.setModuleId(model.getModuleId());
-
-        Map<String, String> convertedMap = model.getData().entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        e -> String.valueOf(e.getValue())
-                ));
-
-        entity.setData(convertedMap);
-        return entity;
-    }
-
 
 }
