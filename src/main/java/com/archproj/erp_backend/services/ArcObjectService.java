@@ -15,9 +15,12 @@ import java.util.stream.Collectors;
 public class ArcObjectService {
 
     private final ArcObjectRepository arcObjectRepository;
+    private final org.springframework.context.ApplicationEventPublisher eventPublisher;
 
-    public ArcObjectService(ArcObjectRepository arcObjectRepository) {
+    public ArcObjectService(ArcObjectRepository arcObjectRepository,
+            org.springframework.context.ApplicationEventPublisher eventPublisher) {
         this.arcObjectRepository = arcObjectRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     public List<ArcObject> getAllByModuleId(Long moduleId) {
@@ -47,12 +50,22 @@ public class ArcObjectService {
 
         // Save and return result
         ArcObjectEntity savedEntity = arcObjectRepository.save(entity);
-        return convertEntityToModel(savedEntity);
+        ArcObject result = convertEntityToModel(savedEntity);
+
+        eventPublisher.publishEvent(new com.archproj.erp_backend.events.ArcObjectUpdatedEvent(this, result));
+
+        return result;
     }
 
     public ArcObject getByModuleIdAndId(Long moduleId, Long id) {
         return arcObjectRepository.findById(id)
                 .filter(obj -> obj.getModuleId().equals(moduleId))
+                .map(this::convertEntityToModel)
+                .orElse(null);
+    }
+
+    public ArcObject getById(Long id) {
+        return arcObjectRepository.findById(id)
                 .map(this::convertEntityToModel)
                 .orElse(null);
     }

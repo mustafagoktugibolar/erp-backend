@@ -29,11 +29,20 @@ public class ArcRelationEntity {
     @Column(name = "relation_type")
     private String relationType; // e.g., "BELONGS_TO", "HAS_MANY"
 
-    public ArcRelationEntity(String sourceType, Long sourceId, String targetType, Long targetId, String relationType) {
+    @Column(name = "settings", length = 4000)
+    private String settings; // JSON rules
+
+    public ArcRelationEntity(String sourceType, Long sourceId, String targetType, Long targetId, String relationType,
+            String settings) {
         this.sourceType = sourceType;
         this.sourceId = sourceId;
         this.targetType = targetType;
         this.targetId = targetId;
         this.relationType = relationType;
+        this.settings = settings;
+    }
+
+    public ArcRelationEntity(String sourceType, Long sourceId, String targetType, Long targetId, String relationType) {
+        this(sourceType, sourceId, targetType, targetId, relationType, null);
     }
 }
