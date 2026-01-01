@@ -19,6 +19,7 @@ public class ArcObject {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long arc_object_id;
     private Long moduleId;
+    private String objectType = "ARC_OBJECT"; // Default type
     @JsonProperty("data")
     private Map<String, Object> data = new HashMap<>();
 

@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "orders")
-public class OrderEntity {
+public class OrderEntity extends BaseArcEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

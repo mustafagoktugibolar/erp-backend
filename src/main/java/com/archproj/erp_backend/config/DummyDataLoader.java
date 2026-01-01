@@ -3,7 +3,6 @@ package com.archproj.erp_backend.config;
 import com.archproj.erp_backend.entities.*;
 import com.archproj.erp_backend.repositories.*;
 import com.archproj.erp_backend.utils.*;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;

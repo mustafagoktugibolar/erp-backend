@@ -4,7 +4,6 @@ import com.archproj.erp_backend.entities.ArcRelationEntity;
 import com.archproj.erp_backend.events.OrderCompletedEvent;
 import com.archproj.erp_backend.events.OrderCreatedEvent;
 import com.archproj.erp_backend.repositories.ArcRelationRepository;
-import com.archproj.erp_backend.services.ArcObjectService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -51,7 +50,9 @@ public class ArcRelationListener {
     }
 
     private void processSmartTriggers(ArcObject sourceObject) {
-        String sourceType = "ARC_OBJECT"; // Or determine based on module
+        String sourceType = sourceObject.getObjectType(); // Dynamic type
+        if (sourceType == null)
+            sourceType = "ARC_OBJECT"; // Fallback
         Long sourceId = sourceObject.getArc_object_id();
 
         List<ArcRelationEntity> relations = arcRelationRepository.findBySourceTypeAndSourceId(sourceType, sourceId);

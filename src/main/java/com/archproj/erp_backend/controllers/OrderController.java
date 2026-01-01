@@ -1,6 +1,5 @@
 package com.archproj.erp_backend.controllers;
 
-import com.archproj.erp_backend.entities.OrderEntity;
 import com.archproj.erp_backend.services.OrderService;
 import com.archproj.erp_backend.models.Order;
 import com.archproj.erp_backend.services.PaymentService;

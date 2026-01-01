@@ -5,8 +5,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name = "companies")
+import java.util.HashMap;
+import java.util.Map;
+
 @Data
 @NoArgsConstructor
 public class Company {
@@ -21,13 +22,15 @@ public class Company {
     @Enumerated(EnumType.STRING)
     private CompanyTypeEnum type;
 
+    private Map<String, Object> data = new HashMap<>();
+
     public Company(String name, String email, CompanyTypeEnum companyType) {
         this.name = name;
         this.email = email;
         this.type = companyType;
     }
 
-    public CompanyTypeEnum getType(){
+    public CompanyTypeEnum getType() {
         return this.type;
     }
 }
