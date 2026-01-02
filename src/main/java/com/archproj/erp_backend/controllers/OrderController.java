@@ -3,19 +3,21 @@ package com.archproj.erp_backend.controllers;
 import com.archproj.erp_backend.services.OrderService;
 import com.archproj.erp_backend.models.Order;
 import com.archproj.erp_backend.services.PaymentService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
-@RequiredArgsConstructor
-
 public class OrderController {
 
     private final OrderService orderService;
     private final PaymentService paymentService;
+
+    public OrderController(OrderService orderService, PaymentService paymentService) {
+        this.orderService = orderService;
+        this.paymentService = paymentService;
+    }
 
     @GetMapping
     public List<Order> getAllOrders() {

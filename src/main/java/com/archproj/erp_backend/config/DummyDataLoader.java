@@ -3,8 +3,6 @@ package com.archproj.erp_backend.config;
 import com.archproj.erp_backend.entities.*;
 import com.archproj.erp_backend.repositories.*;
 import com.archproj.erp_backend.utils.*;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -12,10 +10,13 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.IntStream;
 
-@Slf4j
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Component
-@RequiredArgsConstructor
 public class DummyDataLoader implements CommandLineRunner {
+
+    private static final Logger log = LoggerFactory.getLogger(DummyDataLoader.class);
 
     private final CompanyRepository companyRepository;
     private final CustomerRepository customerRepository;
@@ -23,6 +24,15 @@ public class DummyDataLoader implements CommandLineRunner {
     private final OrderRepository orderRepository;
     private final ModuleRepository moduleRepository;
     private final Random random = new Random();
+
+    public DummyDataLoader(CompanyRepository companyRepository, CustomerRepository customerRepository,
+            ProductRepository productRepository, OrderRepository orderRepository, ModuleRepository moduleRepository) {
+        this.companyRepository = companyRepository;
+        this.customerRepository = customerRepository;
+        this.productRepository = productRepository;
+        this.orderRepository = orderRepository;
+        this.moduleRepository = moduleRepository;
+    }
 
     @Override
     public void run(String... args) throws Exception {

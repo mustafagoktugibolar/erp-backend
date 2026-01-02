@@ -1,18 +1,26 @@
 package com.archproj.erp_backend.entities;
 
 import jakarta.persistence.*;
-import lombok.Data;
 
-@Data
 @Entity
-@Table(name = "arc_objects")
 public class ArcObjectEntity extends BaseArcEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "module_id", nullable = false)
-    private Long moduleId;
+    public Long getId() {
+        return id;
+    }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return "ArcObjectEntity{" +
+                "id=" + id +
+                '}';
+    }
 }

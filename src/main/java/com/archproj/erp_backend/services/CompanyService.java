@@ -54,6 +54,9 @@ public class CompanyService {
         entity.setName(payload.getName());
         entity.setEmail(payload.getEmail());
         entity.setType(payload.getType().name());
+        if (payload.getModuleId() != null) {
+            entity.setModuleId(payload.getModuleId());
+        }
         if (payload.getData() != null) {
             entity.setData(payload.getData());
         }
@@ -69,6 +72,7 @@ public class CompanyService {
     private Company convertEntityToModel(CompanyEntity entity) {
         Company company = new Company(entity.getName(), entity.getEmail(), CompanyTypeEnum.valueOf(entity.getType()));
         company.setId(entity.getId()); // <- Add this line!
+        company.setModuleId(entity.getModuleId());
         company.setData(new java.util.HashMap<>(entity.getData()));
         return company;
     }
@@ -78,6 +82,9 @@ public class CompanyService {
         entity.setName(model.getName());
         entity.setEmail(model.getEmail());
         entity.setType(model.getType().name());
+        if (model.getModuleId() != null) {
+            entity.setModuleId(model.getModuleId());
+        }
         entity.setData(model.getData());
         return entity;
     }
@@ -86,16 +93,10 @@ public class CompanyService {
         // Map Company to ArcObject Structure for the generic listener
         com.archproj.erp_backend.models.ArcObject arcObj = new com.archproj.erp_backend.models.ArcObject();
         arcObj.setArc_object_id(company.getId());
-        // We need a Module ID for Company? Or we treat Company as a "Static Module"
-        // source?
-        // Let's assume Module ID -1 or check how listener distinguishes.
-        // The Listener uses sourceType="ARC_OBJECT" by default. We should probably tell
-        // it "sourceType=COMPANY".
-        // But the current implementation of listener assumes ARC_OBJECT.
-        // Let's stick with ArcObject wrapper.
-        // We can put all Company fields into 'data' map of ArcObject so rules can
-        // access 'name', 'type', etc.
-        arcObj.setModuleId(-1L); // Special ID for Core Entities?
+
+        // Use the actual module ID from the company
+        Long modId = company.getModuleId();
+        arcObj.setModuleId(modId != null ? modId : -1L);
         arcObj.setObjectType("COMPANY");
 
         java.util.Map<String, Object> data = new java.util.HashMap<>(company.getData());

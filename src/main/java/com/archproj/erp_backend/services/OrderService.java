@@ -13,18 +13,23 @@ import com.archproj.erp_backend.events.OrderCompletedEvent;
 import com.archproj.erp_backend.events.OrderCreatedEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
     private final ApplicationEventPublisher eventPublisher;
+
+    public OrderService(OrderRepository orderRepository, OrderMapper orderMapper,
+            ApplicationEventPublisher eventPublisher) {
+        this.orderRepository = orderRepository;
+        this.orderMapper = orderMapper;
+        this.eventPublisher = eventPublisher;
+    }
 
     /**
      * Fetch all orders and convert them to your model.

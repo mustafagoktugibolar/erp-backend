@@ -4,8 +4,6 @@ import com.archproj.erp_backend.entities.ArcRelationEntity;
 import com.archproj.erp_backend.events.OrderCompletedEvent;
 import com.archproj.erp_backend.events.OrderCreatedEvent;
 import com.archproj.erp_backend.repositories.ArcRelationRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -16,14 +14,22 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 
-@Slf4j
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Component
-@RequiredArgsConstructor
 public class ArcRelationListener {
+
+    private static final Logger log = LoggerFactory.getLogger(ArcRelationListener.class);
 
     private final ArcRelationRepository arcRelationRepository;
     private final ArcObjectService arcObjectService;
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public ArcRelationListener(ArcRelationRepository arcRelationRepository, ArcObjectService arcObjectService) {
+        this.arcRelationRepository = arcRelationRepository;
+        this.arcObjectService = arcObjectService;
+    }
 
     @EventListener
     public void onOrderCreated(OrderCreatedEvent event) {

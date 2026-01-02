@@ -4,19 +4,21 @@ import com.archproj.erp_backend.entities.InvoiceEntity;
 import com.archproj.erp_backend.models.Invoice;
 import com.archproj.erp_backend.services.InvoiceService;
 import com.archproj.erp_backend.services.OrderService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/invoices")
-@RequiredArgsConstructor
-
 public class InvoiceController {
 
     private final InvoiceService invoiceService;
     private final OrderService orderService;
+
+    public InvoiceController(InvoiceService invoiceService, OrderService orderService) {
+        this.invoiceService = invoiceService;
+        this.orderService = orderService;
+    }
 
     @GetMapping
     public List<Invoice> getAllInvoices() {

@@ -2,7 +2,6 @@ package com.archproj.erp_backend.controllers;
 
 import com.archproj.erp_backend.entities.ArcRelationEntity;
 import com.archproj.erp_backend.services.ArcRelationService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,10 +9,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/relations")
-@RequiredArgsConstructor
 public class ArcRelationController {
 
     private final ArcRelationService arcRelationService;
+
+    public ArcRelationController(ArcRelationService arcRelationService) {
+        this.arcRelationService = arcRelationService;
+    }
 
     public record CreateRelationRequest(String sourceType, Long sourceId, String targetType, Long targetId,
             String relationType, String settings) {

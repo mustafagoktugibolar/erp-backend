@@ -1,6 +1,5 @@
 package com.archproj.erp_backend.services;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
@@ -10,9 +9,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-@Slf4j
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 public class ExcelService {
+
+    private static final Logger log = LoggerFactory.getLogger(ExcelService.class);
 
     public List<Map<String, Object>> parseExcelFile(MultipartFile file) throws IOException {
         List<Map<String, Object>> result = new ArrayList<>();

@@ -14,12 +14,23 @@ public abstract class BaseArcEntity {
     @Convert(converter = com.archproj.erp_backend.utils.JpaJsonConverter.class)
     protected Map<String, Object> data = new HashMap<>();
 
+    @Column(name = "module_id")
+    protected Long moduleId = -1L; // Default to -1 (System/Core)
+
     public Map<String, Object> getData() {
         return data;
     }
 
     public void setData(Map<String, Object> data) {
         this.data = data;
+    }
+
+    public Long getModuleId() {
+        return moduleId;
+    }
+
+    public void setModuleId(Long moduleId) {
+        this.moduleId = moduleId;
     }
 
     public void setDynamic(String key, Object value) {

@@ -2,17 +2,19 @@ package com.archproj.erp_backend.services;
 
 import com.archproj.erp_backend.entities.ArcRelationEntity;
 import com.archproj.erp_backend.repositories.ArcRelationRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class ArcRelationService {
 
     private final ArcRelationRepository arcRelationRepository;
+
+    public ArcRelationService(ArcRelationRepository arcRelationRepository) {
+        this.arcRelationRepository = arcRelationRepository;
+    }
 
     @Transactional
     public ArcRelationEntity createRelation(String sourceType, Long sourceId, String targetType, Long targetId,
