@@ -70,6 +70,18 @@ class ArcRelationControllerTest {
     }
 
     @Test
+    void getRelations_ShouldReturnAllRelations_WhenNoParamsProvided() throws Exception {
+        // Arrange
+        ArcRelationEntity entity = new ArcRelationEntity("COMPANY", 1L, "CUSTOMER", 2L, "PARTNER", "{}");
+        given(arcRelationService.getAllRelations()).willReturn(List.of(entity));
+
+        // Act & Assert
+        mockMvc.perform(get("/api/relations"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].sourceType").value("COMPANY"));
+    }
+
+    @Test
     void deleteRelation_ShouldReturnNoContent() throws Exception {
         // Arrange
         doNothing().when(arcRelationService).deleteRelation(1L);

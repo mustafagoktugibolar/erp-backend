@@ -24,11 +24,14 @@ public class ArcRelationListener {
 
     private final ArcRelationRepository arcRelationRepository;
     private final ArcObjectService arcObjectService;
+    private final com.archproj.erp_backend.repositories.ModuleRepository moduleRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public ArcRelationListener(ArcRelationRepository arcRelationRepository, ArcObjectService arcObjectService) {
+    public ArcRelationListener(ArcRelationRepository arcRelationRepository, ArcObjectService arcObjectService,
+            com.archproj.erp_backend.repositories.ModuleRepository moduleRepository) {
         this.arcRelationRepository = arcRelationRepository;
         this.arcObjectService = arcObjectService;
+        this.moduleRepository = moduleRepository;
     }
 
     @EventListener
@@ -57,9 +60,19 @@ public class ArcRelationListener {
 
     private void processSmartTriggers(ArcObject sourceObject) {
         String sourceType = sourceObject.getObjectType(); // Dynamic type
-        if (sourceType == null)
-            sourceType = "ARC_OBJECT"; // Fallback
+        if (sourceType == null || "ARC_OBJECT".equals(sourceType)) {
+            // Try to resolve generic "ARC_OBJECT" to specific Module Name (e.g. "deneme11")
+            if (sourceObject.getModuleId() != null) {
+                sourceType = moduleRepository.findById(sourceObject.getModuleId())
+                        .map(com.archproj.erp_backend.entities.ModuleEntity::getName)
+                        .orElse("ARC_OBJECT");
+            } else {
+                sourceType = "ARC_OBJECT"; // Fallback
+            }
+        }
         Long sourceId = sourceObject.getArc_object_id();
+
+        log.info("Smart Trigger: Processing for SourceType: " + sourceType + ", SourceID: " + sourceId);
 
         List<ArcRelationEntity> relations = arcRelationRepository.findBySourceTypeAndSourceId(sourceType, sourceId);
 
@@ -93,7 +106,12 @@ public class ArcRelationListener {
 
             if (valueMapping.has(currentValue)) {
                 String targetValue = valueMapping.get(currentValue).asText();
+                log.info("Smart Trigger: Rule Matched! Source Value: " + currentValue + " => Target Value: "
+                        + targetValue);
                 updateTargetObject(relation.getTargetType(), relation.getTargetId(), targetField, targetValue);
+            } else {
+                log.info("Smart Trigger: No rule match for value '" + currentValue + "'. Known mappings: "
+                        + valueMapping.toString());
             }
 
         } catch (Exception e) {
@@ -102,16 +120,38 @@ public class ArcRelationListener {
     }
 
     private void updateTargetObject(String targetType, Long targetId, String field, String value) {
+        log.info("Attempting to update target object. Type: " + targetType + ", ID: " + targetId + ", Field: " + field
+                + ", New Value: " + value);
 
-        if ("ARC_OBJECT".equals(targetType)) {
-            ArcObject target = arcObjectService.getById(targetId);
-            if (target != null) {
-                target.set(field, value);
-                arcObjectService.save(target);
-                log.info("Smart Trigger: Updated ArcObject " + targetId + " field " + field + " to " + value);
-            } else {
-                log.warn("Smart Trigger: Target ArcObject " + targetId + " not found.");
+        // List of known static types that are NOT ArcObjects
+        // (You can expand this list as needed based on your entity model)
+        List<String> staticTypes = List.of("COMPANY", "ORDER", "INVOICE", "CUSTOMER", "PRODUCT");
+
+        if (!staticTypes.contains(targetType)) {
+            // Assume it's a Dynamic Module (ArcObject) if it's not a static type
+            try {
+                ArcObject target = arcObjectService.getById(targetId);
+                if (target != null) {
+                    Object existingValue = target.get(field);
+                    String existingString = existingValue != null ? existingValue.toString() : null;
+
+                    if (value.equals(existingString)) {
+                        log.info("Smart Trigger: Value unchanged for " + targetType + " " + targetId + " field " + field
+                                + ". Skipping update to prevent loop.");
+                        return;
+                    }
+
+                    target.set(field, value);
+                    arcObjectService.save(target);
+                    log.info("Smart Trigger: Successfully updated " + targetType + " (ArcObject) " + targetId);
+                } else {
+                    log.warn("Smart Trigger: Target " + targetType + " with ID " + targetId + " not found.");
+                }
+            } catch (Exception e) {
+                log.error("Smart Trigger: Failed to update target " + targetType + " " + targetId, e);
             }
+        } else {
+            log.warn("Smart Trigger: Update not yet implemented for static type: " + targetType);
         }
     }
 

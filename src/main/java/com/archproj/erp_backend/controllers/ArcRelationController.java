@@ -44,7 +44,7 @@ public class ArcRelationController {
         } else if (targetType != null && targetId != null) {
             return arcRelationService.getRelationsByTarget(targetType, targetId);
         } else {
-            return List.of(); // Prevent dumping all relations without filter
+            return arcRelationService.getAllRelations();
         }
     }
 
@@ -52,5 +52,17 @@ public class ArcRelationController {
     public ResponseEntity<Void> deleteRelation(@PathVariable Long id) {
         arcRelationService.deleteRelation(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}")
+    public ArcRelationEntity updateRelation(@PathVariable Long id, @RequestBody CreateRelationRequest request) {
+        return arcRelationService.updateRelation(
+                id,
+                request.sourceType(),
+                request.sourceId(),
+                request.targetType(),
+                request.targetId(),
+                request.relationType(),
+                request.settings());
     }
 }

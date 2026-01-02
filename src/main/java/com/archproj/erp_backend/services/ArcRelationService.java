@@ -45,8 +45,26 @@ public class ArcRelationService {
         return arcRelationRepository.findByTargetTypeAndTargetId(targetType, targetId);
     }
 
+    public List<ArcRelationEntity> getAllRelations() {
+        return arcRelationRepository.findAll();
+    }
+
     @Transactional
     public void deleteRelation(Long id) {
         arcRelationRepository.deleteById(id);
+    }
+
+    @Transactional
+    public ArcRelationEntity updateRelation(Long id, String sourceType, Long sourceId, String targetType, Long targetId,
+            String relationType, String settings) {
+        return arcRelationRepository.findById(id).map(relation -> {
+            relation.setSourceType(sourceType);
+            relation.setSourceId(sourceId);
+            relation.setTargetType(targetType);
+            relation.setTargetId(targetId);
+            relation.setRelationType(relationType);
+            relation.setSettings(settings);
+            return arcRelationRepository.save(relation);
+        }).orElseThrow(() -> new IllegalArgumentException("Relation not found with id: " + id));
     }
 }
