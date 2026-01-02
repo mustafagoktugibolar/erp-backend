@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(name = "module_entities")
 public class ModuleEntity {
 
     @Id
@@ -13,7 +14,7 @@ public class ModuleEntity {
     private Long id;
 
     private String name; // Display name of the module
-    private String key; // Unique identifier used in frontend routing
+    private String moduleKey; // Unique identifier used in frontend routing
     private String route; // Route path (e.g., "/products")
     private String icon; // Icon name (e.g., "inventory_2")\
     private String type;
@@ -37,12 +38,12 @@ public class ModuleEntity {
         this.name = name;
     }
 
-    public String getKey() {
-        return key;
+    public String getModuleKey() {
+        return moduleKey;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setModuleKey(String moduleKey) {
+        this.moduleKey = moduleKey;
     }
 
     public String getRoute() {
@@ -82,7 +83,7 @@ public class ModuleEntity {
         return "ModuleEntity{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", key='" + key + '\'' +
+                ", moduleKey='" + moduleKey + '\'' +
                 ", route='" + route + '\'' +
                 ", icon='" + icon + '\'' +
                 ", type='" + type + '\'' +

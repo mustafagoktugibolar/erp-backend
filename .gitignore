@@ -44,6 +44,7 @@ logs/
 *.h2.db
 *.mv.db
 *.sqlite
+*.db
 data/
 db/
 .env

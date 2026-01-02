@@ -4,6 +4,8 @@ import com.archproj.erp_backend.entities.*;
 import com.archproj.erp_backend.repositories.*;
 import com.archproj.erp_backend.utils.*;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -34,8 +36,14 @@ public class DummyDataLoader implements CommandLineRunner {
         this.moduleRepository = moduleRepository;
     }
 
+    @Autowired
+    private org.springframework.core.env.Environment env;
+
     @Override
     public void run(String... args) throws Exception {
+        if (Arrays.asList(env.getActiveProfiles()).contains("test")) {
+            return;
+        }
         if (companyRepository.count() == 0) {
             loadDummyData();
         }
@@ -65,7 +73,7 @@ public class DummyDataLoader implements CommandLineRunner {
     private ModuleEntity createModule(String name, String key, String route, String icon, String type) {
         ModuleEntity module = new ModuleEntity();
         module.setName(name);
-        module.setKey(key);
+        module.setModuleKey(key);
         module.setRoute(route);
         module.setIcon(icon);
         module.setType(type);

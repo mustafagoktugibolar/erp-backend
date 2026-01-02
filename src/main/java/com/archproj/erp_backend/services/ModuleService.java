@@ -44,7 +44,7 @@ public class ModuleService {
 
         // 2) update basic fields
         existing.setName(module.getName());
-        existing.setKey(module.getKey());
+        existing.setModuleKey(module.getKey());
         existing.setRoute(module.getRoute());
         existing.setIcon(module.getIcon());
         existing.setType(module.getType().name());
@@ -66,7 +66,6 @@ public class ModuleService {
         return convertEntityToModel(updated);
     }
 
-
     public void deleteModule(Long id) {
         moduleRepository.deleteById(id);
     }
@@ -75,7 +74,7 @@ public class ModuleService {
         ModuleInfo dto = new ModuleInfo();
         dto.setId(e.getId());
         dto.setName(e.getName());
-        dto.setKey(e.getKey());
+        dto.setKey(e.getModuleKey());
         dto.setRoute(e.getRoute());
         dto.setIcon(e.getIcon());
         dto.setType(Enum.valueOf(ModuleTypes.class, e.getType()));
@@ -97,7 +96,7 @@ public class ModuleService {
     private ModuleEntity convertModelToEntity(ModuleInfo dto) {
         ModuleEntity e = new ModuleEntity();
         e.setName(dto.getName());
-        e.setKey(dto.getKey());
+        e.setModuleKey(dto.getKey());
         e.setRoute(dto.getRoute());
         e.setIcon(dto.getIcon());
         e.setType(dto.getType().name());

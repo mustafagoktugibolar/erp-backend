@@ -29,6 +29,10 @@ public class ArcObjectService {
                 .collect(Collectors.toList());
     }
 
+    public List<ArcObjectEntity> getAllEntitiesByModuleId(Long moduleId) {
+        return arcObjectRepository.findByModuleId(moduleId);
+    }
+
     @Transactional
     public ArcObject save(ArcObject model) {
         ArcObjectEntity entity;

@@ -74,7 +74,10 @@ public class ArcRelationListener {
 
         log.info("Smart Trigger: Processing for SourceType: " + sourceType + ", SourceID: " + sourceId);
 
-        List<ArcRelationEntity> relations = arcRelationRepository.findBySourceTypeAndSourceId(sourceType, sourceId);
+        List<ArcRelationEntity> relations = new java.util.ArrayList<>(
+                arcRelationRepository.findBySourceTypeAndSourceId(sourceType, sourceId));
+        List<ArcRelationEntity> globalRelations = arcRelationRepository.findBySourceTypeAndSourceId(sourceType, -1L);
+        relations.addAll(globalRelations);
 
         for (ArcRelationEntity relation : relations) {
             if (relation.getSettings() != null && !relation.getSettings().isEmpty()) {
@@ -108,7 +111,28 @@ public class ArcRelationListener {
                 String targetValue = valueMapping.get(currentValue).asText();
                 log.info("Smart Trigger: Rule Matched! Source Value: " + currentValue + " => Target Value: "
                         + targetValue);
-                updateTargetObject(relation.getTargetType(), relation.getTargetId(), targetField, targetValue);
+
+                if (relation.getTargetId() == -1) {
+                    // Global Rule Logic
+                    String joinKeySource = settings.path("joinKeySource").asText("");
+                    String joinKeyTarget = settings.path("joinKeyTarget").asText("");
+
+                    if (!joinKeySource.isEmpty() && !joinKeyTarget.isEmpty()) {
+                        Object joinValObj = sourceObject.get(joinKeySource);
+                        String joinValue = joinValObj != null ? joinValObj.toString() : null;
+
+                        if (joinValue != null) {
+                            updateGlobalTargets(relation.getTargetType(), joinKeyTarget, joinValue, targetField,
+                                    targetValue);
+                        } else {
+                            log.warn("Smart Trigger: Join Key Source value is null for key: " + joinKeySource);
+                        }
+                    } else {
+                        log.warn("Smart Trigger: Global Rule missing join keys.");
+                    }
+                } else {
+                    updateTargetObject(relation.getTargetType(), relation.getTargetId(), targetField, targetValue);
+                }
             } else {
                 log.info("Smart Trigger: No rule match for value '" + currentValue + "'. Known mappings: "
                         + valueMapping.toString());
@@ -119,31 +143,74 @@ public class ArcRelationListener {
         }
     }
 
+    private void updateGlobalTargets(String targetType, String joinKeyTarget, String joinValue, String field,
+            String value) {
+        log.info("Smart Trigger: Global Update requested for " + targetType + " where " + joinKeyTarget + " = "
+                + joinValue);
+
+        // Resolve Target Module ID from Name
+        moduleRepository.findByName(targetType).ifPresentOrElse(module -> {
+            List<com.archproj.erp_backend.entities.ArcObjectEntity> candidates = arcObjectService
+                    .getAllEntitiesByModuleId(module.getId());
+
+            // In-memory filter (inefficient for large data, but works for MVP)
+            // Ideally should be a DB Query: SELECT * FROM ArcObject WHERE module_id=? AND
+            // data->>? = ?
+            int count = 0;
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+
+            for (com.archproj.erp_backend.entities.ArcObjectEntity entity : candidates) {
+                try {
+                    com.fasterxml.jackson.databind.JsonNode data = mapper.valueToTree(entity.getData());
+                    String targetJoinVal = data.path(joinKeyTarget).asText();
+
+                    if (joinValue.equals(targetJoinVal)) {
+                        ArcObject targetModel = arcObjectService.getById(entity.getId());
+                        updateTargetModel(targetModel, targetType, field, value); // Reuse update logic
+                        count++;
+                    }
+                } catch (Exception e) {
+                    log.warn("Smart Trigger: Failed to parse data for entity match", e);
+                }
+            }
+            log.info("Smart Trigger: Global Update completed. Affected records: " + count);
+
+        }, () -> log.error("Smart Trigger: Target Module '" + targetType + "' not found."));
+    }
+
+    private void updateTargetModel(ArcObject target, String targetType, String field, String value) {
+        try {
+            if (target != null) {
+                Object existingValue = target.get(field);
+                String existingString = existingValue != null ? existingValue.toString() : null;
+
+                if (value.equals(existingString)) {
+                    log.info("Smart Trigger: Value unchanged for " + targetType + " " + target.getArc_object_id()
+                            + ". Skipping.");
+                    return;
+                }
+
+                target.set(field, value);
+                arcObjectService.save(target);
+                log.info("Smart Trigger: Successfully updated " + targetType + " " + target.getArc_object_id());
+            }
+        } catch (Exception e) {
+            log.error("Smart Trigger: Failed to update target " + targetType, e);
+        }
+    }
+
     private void updateTargetObject(String targetType, Long targetId, String field, String value) {
         log.info("Attempting to update target object. Type: " + targetType + ", ID: " + targetId + ", Field: " + field
                 + ", New Value: " + value);
 
-        // List of known static types that are NOT ArcObjects
-        // (You can expand this list as needed based on your entity model)
         List<String> staticTypes = List.of("COMPANY", "ORDER", "INVOICE", "CUSTOMER", "PRODUCT");
 
         if (!staticTypes.contains(targetType)) {
-            // Assume it's a Dynamic Module (ArcObject) if it's not a static type
+            // Assume it's a Dynamic Module (ArcObject)
             try {
                 ArcObject target = arcObjectService.getById(targetId);
                 if (target != null) {
-                    Object existingValue = target.get(field);
-                    String existingString = existingValue != null ? existingValue.toString() : null;
-
-                    if (value.equals(existingString)) {
-                        log.info("Smart Trigger: Value unchanged for " + targetType + " " + targetId + " field " + field
-                                + ". Skipping update to prevent loop.");
-                        return;
-                    }
-
-                    target.set(field, value);
-                    arcObjectService.save(target);
-                    log.info("Smart Trigger: Successfully updated " + targetType + " (ArcObject) " + targetId);
+                    updateTargetModel(target, targetType, field, value);
                 } else {
                     log.warn("Smart Trigger: Target " + targetType + " with ID " + targetId + " not found.");
                 }
