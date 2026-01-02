@@ -63,3 +63,4 @@ yarn-error.log
 
 # Spring Boot Actuator
 actuator.log
+database/erp-backend.db
