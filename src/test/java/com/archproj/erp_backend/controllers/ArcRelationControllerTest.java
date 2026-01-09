@@ -22,72 +22,72 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(ArcRelationController.class)
 class ArcRelationControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-    @MockBean
-    private ArcRelationService arcRelationService;
+        @MockBean
+        private ArcRelationService arcRelationService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+        @Autowired
+        private ObjectMapper objectMapper;
 
-    @Test
-    void createRelation_ShouldReturnCreatedRelation() throws Exception {
-        // Arrange
-        ArcRelationController.CreateRelationRequest request = new ArcRelationController.CreateRelationRequest(
-                "COMPANY", 1L, "CUSTOMER", 2L, "PARTNER", "{}");
+        @Test
+        void createRelation_ShouldReturnCreatedRelation() throws Exception {
+                // Arrange
+                ArcRelationController.CreateRelationRequest request = new ArcRelationController.CreateRelationRequest(
+                                "COMPANY", 1L, "CUSTOMER", 2L, "PARTNER", "{}");
 
-        ArcRelationEntity createdEntity = new ArcRelationEntity("COMPANY", 1L, "CUSTOMER", 2L, "PARTNER", "{}");
-        createdEntity.setId(10L);
+                ArcRelationEntity createdEntity = new ArcRelationEntity("COMPANY", 1L, "CUSTOMER", 2L, "PARTNER", "{}");
+                createdEntity.setId(10L);
 
-        given(arcRelationService.createRelation(
-                anyString(), any(Long.class), anyString(), any(Long.class), anyString(), anyString()))
-                .willReturn(createdEntity);
+                given(arcRelationService.createRelation(
+                                anyString(), any(Long.class), anyString(), any(Long.class), anyString(), anyString()))
+                                .willReturn(createdEntity);
 
-        // Act & Assert
-        mockMvc.perform(post("/api/relations")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(10L))
-                .andExpect(jsonPath("$.sourceType").value("COMPANY"))
-                .andExpect(jsonPath("$.relationType").value("PARTNER"));
-    }
+                // Act & Assert
+                mockMvc.perform(post("/api/relations")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.id").value(10L))
+                                .andExpect(jsonPath("$.sourceType").value("COMPANY"))
+                                .andExpect(jsonPath("$.relationType").value("PARTNER"));
+        }
 
-    @Test
-    void getRelations_ShouldReturnList() throws Exception {
-        // Arrange
-        ArcRelationEntity entity = new ArcRelationEntity("COMPANY", 1L, "CUSTOMER", 2L, "PARTNER", "{}");
-        given(arcRelationService.getRelationsBySource("COMPANY", 1L))
-                .willReturn(List.of(entity));
+        @Test
+        void getRelations_ShouldReturnList() throws Exception {
+                // Arrange
+                ArcRelationEntity entity = new ArcRelationEntity("COMPANY", 1L, "CUSTOMER", 2L, "PARTNER", "{}");
+                given(arcRelationService.getRelationsBySource("COMPANY", 1L))
+                                .willReturn(List.of(entity));
 
-        // Act & Assert
-        mockMvc.perform(get("/api/relations")
-                .param("sourceType", "COMPANY")
-                .param("sourceId", "1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].sourceType").value("COMPANY"));
-    }
+                // Act & Assert
+                mockMvc.perform(get("/api/relations")
+                                .param("sourceType", "COMPANY")
+                                .param("sourceId", "1"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$[0].sourceType").value("COMPANY"));
+        }
 
-    @Test
-    void getRelations_ShouldReturnAllRelations_WhenNoParamsProvided() throws Exception {
-        // Arrange
-        ArcRelationEntity entity = new ArcRelationEntity("COMPANY", 1L, "CUSTOMER", 2L, "PARTNER", "{}");
-        given(arcRelationService.getAllRelations()).willReturn(List.of(entity));
+        @Test
+        void getRelations_ShouldReturnAllRelations_WhenNoParamsProvided() throws Exception {
+                // Arrange
+                ArcRelationEntity entity = new ArcRelationEntity("COMPANY", 1L, "CUSTOMER", 2L, "PARTNER", "{}");
+                given(arcRelationService.getAllRelations()).willReturn(List.of(entity));
 
-        // Act & Assert
-        mockMvc.perform(get("/api/relations"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].sourceType").value("COMPANY"));
-    }
+                // Act & Assert
+                mockMvc.perform(get("/api/relations"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$[0].sourceType").value("COMPANY"));
+        }
 
-    @Test
-    void deleteRelation_ShouldReturnNoContent() throws Exception {
-        // Arrange
-        doNothing().when(arcRelationService).deleteRelation(1L);
+        @Test
+        void deleteRelation_ShouldReturnNoContent() throws Exception {
+                // Arrange
+                doNothing().when(arcRelationService).deleteRelation(1L);
 
-        // Act & Assert
-        mockMvc.perform(delete("/api/relations/1"))
-                .andExpect(status().isNoContent());
-    }
+                // Act & Assert
+                mockMvc.perform(delete("/api/relations/1"))
+                                .andExpect(status().isNoContent());
+        }
 }

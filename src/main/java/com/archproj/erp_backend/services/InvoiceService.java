@@ -56,21 +56,4 @@ public class InvoiceService {
                 InvoiceStatusEnum.valueOf(entity.getStatus()) // Enum -> String
         );
     }
-
-    private InvoiceEntity convertModelToEntity(Invoice model) {
-        InvoiceEntity entity = new InvoiceEntity();
-        entity.setId(model.getId());
-        entity.setOrderId(model.getOrderId());
-        entity.setIssueDate(model.getIssueDate());
-        entity.setAmount(model.getAmount());
-        entity.setInvoiceNumber(model.getInvoiceNumber());
-
-        if (model.getStatus() != null) {
-            entity.setStatus(model.getStatus().name()); // String -> Enum
-        } else {
-            entity.setStatus(InvoiceStatusEnum.CREATED.name()); // varsayılan
-        }
-
-        return entity;
-    }
 }

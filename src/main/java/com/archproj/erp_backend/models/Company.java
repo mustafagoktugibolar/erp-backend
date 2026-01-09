@@ -1,7 +1,6 @@
 package com.archproj.erp_backend.models;
 
 import com.archproj.erp_backend.utils.CompanyTypeEnum;
-import jakarta.persistence.*;
 
 import java.util.HashMap;
 import java.util.Map;

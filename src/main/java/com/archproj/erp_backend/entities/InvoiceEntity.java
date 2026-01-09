@@ -1,6 +1,5 @@
 package com.archproj.erp_backend.entities;
 
-import com.archproj.erp_backend.utils.InvoiceStatusEnum;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;

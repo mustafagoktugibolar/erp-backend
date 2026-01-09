@@ -5,7 +5,6 @@ import com.archproj.erp_backend.repositories.*;
 import com.archproj.erp_backend.utils.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -45,7 +44,7 @@ public class DummyDataLoader implements CommandLineRunner {
             return;
         }
         if (companyRepository.count() == 0) {
-            loadDummyData();
+            // loadDummyData();
         }
     }
 
